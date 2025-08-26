@@ -63,15 +63,32 @@ public class EditSession: ObservableObject {
     /// Current state of image processing
     @Published public private(set) var processingState: ProcessingState = .idle
     
-    /// Current image adjustments
-    @Published public var adjustments = ImageAdjustments() {
+    /// Base adjustments applied by the current filter
+    @Published public private(set) var baseAdjustments = ImageAdjustments()
+    
+    /// User-made manual adjustments (additive to base adjustments)
+    @Published public var userAdjustments = ImageAdjustments() {
         didSet {
-            if adjustments != oldValue {
+            if userAdjustments != oldValue {
                 Task {
-                    await updatePreview(reason: "Adjustments changed")
-                    recordOperation(.adjustmentChange, description: "Updated image adjustments")
+                    await updatePreview(reason: "User adjustments changed")
+                    recordOperation(.adjustmentChange, description: "Updated manual adjustments")
                 }
             }
+        }
+    }
+    
+    /// Combined effective adjustments (base + user adjustments)
+    public var effectiveAdjustments: ImageAdjustments {
+        return baseAdjustments.combined(with: userAdjustments)
+    }
+    
+    /// Legacy property for backward compatibility - returns effective adjustments
+    public var adjustments: ImageAdjustments {
+        get { return effectiveAdjustments }
+        set { 
+            // When setting adjustments directly, treat them as user adjustments
+            userAdjustments = newValue
         }
     }
     
@@ -108,7 +125,7 @@ public class EditSession: ObservableObject {
     
     /// Whether any edits have been made
     public var hasEdits: Bool {
-        adjustments.hasAdjustments || appliedFilter?.isEffective == true
+        baseAdjustments.hasAdjustments || userAdjustments.hasAdjustments || appliedFilter?.isEffective == true
     }
     
     /// Current image extent for UI calculations
@@ -155,15 +172,23 @@ public class EditSession: ObservableObject {
         sessionStats = SessionStatistics()
     }
     
-    /// Update adjustments with specific values
+    /// Update adjustments with specific values (legacy method)
     public func updateAdjustments(_ newAdjustments: ImageAdjustments) {
         adjustments = newAdjustments
+    }
+    
+    /// Update user adjustments specifically (recommended method)
+    public func updateUserAdjustments(_ newAdjustments: ImageAdjustments) {
+        userAdjustments = newAdjustments
     }
     
     /// Apply a filter with specified intensity
     public func applyFilter(_ filterType: FilterType, intensity: Float = 1.0) {
         // Set pending filter immediately for UI feedback
         pendingFilter = filterType
+        
+        // Update base adjustments to reflect what the filter does
+        baseAdjustments = filterType.getScaledAdjustments(intensity: intensity)
         
         let newFilter = AppliedFilter(filterType: filterType, intensity: intensity)
         appliedFilter = newFilter
@@ -172,6 +197,10 @@ public class EditSession: ObservableObject {
     /// Update the intensity of the current filter
     public func updateFilterIntensity(_ intensity: Float) {
         guard let currentFilter = appliedFilter else { return }
+        
+        // Update base adjustments to reflect new intensity
+        baseAdjustments = currentFilter.filterType.getScaledAdjustments(intensity: intensity)
+        
         appliedFilter = currentFilter.withIntensity(intensity)
     }
     
@@ -254,7 +283,8 @@ public class EditSession: ObservableObject {
     // MARK: - Private Methods
     
     private func resetEditsInternal() {
-        adjustments = ImageAdjustments()
+        baseAdjustments = ImageAdjustments()
+        userAdjustments = ImageAdjustments()
         appliedFilter = nil
         pendingFilter = nil
         fullResolutionImage = originalImage

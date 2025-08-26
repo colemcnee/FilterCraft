@@ -137,4 +137,82 @@ public enum FilterType: String, CaseIterable, Identifiable, Sendable {
     public static var filtersByCategory: [FilterCategory: [FilterType]] {
         Dictionary(grouping: FilterType.allCases, by: \.category)
     }
+    
+    /// Returns the base adjustments this filter applies at full intensity
+    /// This allows the UI to show users what the filter is doing to their image
+    public var baseAdjustments: ImageAdjustments {
+        switch self {
+        case .none:
+            return ImageAdjustments()
+            
+        case .vintage:
+            // Vintage: warm tones, reduced contrast, slight desaturation
+            return ImageAdjustments(
+                contrast: -0.1,
+                saturation: -0.2,
+                warmth: 0.3,
+                tint: 0.1
+            )
+            
+        case .blackAndWhite:
+            // B&W: complete desaturation
+            return ImageAdjustments(
+                saturation: -1.0
+            )
+            
+        case .vibrant:
+            // Vibrant: increased saturation and slight contrast boost
+            return ImageAdjustments(
+                contrast: 0.2,
+                saturation: 0.4
+            )
+            
+        case .sepia:
+            // Sepia: warm, desaturated tones
+            return ImageAdjustments(
+                saturation: -0.3,
+                warmth: 0.4,
+                tint: 0.2
+            )
+            
+        case .cool:
+            // Cool: cooler tones, slight brightness boost
+            return ImageAdjustments(
+                brightness: 0.1,
+                saturation: 0.1,
+                warmth: -0.4,
+                tint: -0.1
+            )
+            
+        case .warm:
+            // Warm: warmer tones, cozy feeling
+            return ImageAdjustments(
+                saturation: 0.2,
+                warmth: 0.5,
+                tint: 0.1
+            )
+            
+        case .dramatic:
+            // Dramatic: high contrast, enhanced shadows/highlights
+            return ImageAdjustments(
+                contrast: 0.4,
+                saturation: 0.2,
+                highlights: -0.2,
+                shadows: 0.3
+            )
+            
+        case .soft:
+            // Soft: reduced contrast, slight brightness boost
+            return ImageAdjustments(
+                brightness: 0.1,
+                contrast: -0.3,
+                highlights: 0.1
+            )
+        }
+    }
+    
+    /// Returns the base adjustments scaled by the given intensity
+    public func getScaledAdjustments(intensity: Float) -> ImageAdjustments {
+        return baseAdjustments.scaled(by: intensity)
+    }
 }

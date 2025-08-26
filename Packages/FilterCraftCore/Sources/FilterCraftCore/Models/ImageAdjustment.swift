@@ -200,4 +200,49 @@ public struct ImageAdjustments: Equatable, Sendable {
             tint = clampedValue
         }
     }
+    
+    /// Combines this adjustment with another, using the other's values where they exist
+    public func combined(with other: ImageAdjustments) -> ImageAdjustments {
+        return ImageAdjustments(
+            brightness: brightness + other.brightness,
+            contrast: contrast + other.contrast,
+            saturation: saturation + other.saturation,
+            exposure: exposure + other.exposure,
+            highlights: highlights + other.highlights,
+            shadows: shadows + other.shadows,
+            warmth: warmth + other.warmth,
+            tint: tint + other.tint
+        )
+    }
+    
+    /// Returns a scaled version of these adjustments by the given factor
+    public func scaled(by factor: Float) -> ImageAdjustments {
+        return ImageAdjustments(
+            brightness: brightness * factor,
+            contrast: contrast * factor,
+            saturation: saturation * factor,
+            exposure: exposure * factor,
+            highlights: highlights * factor,
+            shadows: shadows * factor,
+            warmth: warmth * factor,
+            tint: tint * factor
+        )
+    }
+    
+    /// Blends these adjustments with another using linear interpolation
+    public func blended(with other: ImageAdjustments, factor: Float) -> ImageAdjustments {
+        let t = max(0.0, min(1.0, factor)) // Clamp to 0-1
+        let invT = 1.0 - t
+        
+        return ImageAdjustments(
+            brightness: brightness * invT + other.brightness * t,
+            contrast: contrast * invT + other.contrast * t,
+            saturation: saturation * invT + other.saturation * t,
+            exposure: exposure * invT + other.exposure * t,
+            highlights: highlights * invT + other.highlights * t,
+            shadows: shadows * invT + other.shadows * t,
+            warmth: warmth * invT + other.warmth * t,
+            tint: tint * invT + other.tint * t
+        )
+    }
 }
