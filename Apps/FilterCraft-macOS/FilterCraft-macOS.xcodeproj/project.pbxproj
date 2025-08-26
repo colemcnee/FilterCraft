@@ -1,0 +1,487 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0833DBDFA2DF415888328482 /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A792F4B87FF98519B60C8DE /* ToolbarView.swift */; };
+		3554613802619DDAA43D2821 /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF4D1A502E994C9CF265F2B /* ImagePickerView.swift */; };
+		4E2E04E287B089A4CC51264B /* ViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E32202F14552A629FDB0519B /* ViewTests.swift */; };
+		4E831A1DF577E4F94632CF51 /* FilterCraftCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF807B9F389C0AA53FECDB90 /* FilterCraftCommands.swift */; };
+		5ECCEAB2ACF3FC4BF36749F6 /* DropZoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B59C5F69B34BAAFB943466 /* DropZoneView.swift */; };
+		826FD1B9EAC24F1C3F9AE0DD /* AdjustmentControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1AD7D238CF862A4B79CA25 /* AdjustmentControlsView.swift */; };
+		992EA4CB485E5E199190E41B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3969B320B9D0C2013E0614E8 /* ContentView.swift */; };
+		9BED8A9A7145946B205FA4A5 /* FilterCraftMacOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF9BBB910A8A598B44BD7C06 /* FilterCraftMacOSTests.swift */; };
+		A964288F54610F9D1AD7D430 /* InspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0C188778998F25C34C5FAE /* InspectorView.swift */; };
+		AA0920E39F98433BE1AB4943 /* FilterCraftCore in Frameworks */ = {isa = PBXBuildFile; productRef = FFE7350BD47E16890336A0DC /* FilterCraftCore */; };
+		B597C4C51655DC19F739208E /* ImageCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43947E7E331794F6E820ACA8 /* ImageCanvasView.swift */; };
+		BE48156663A4EC0EAB7E66C9 /* FilterCraftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D792C734D275038FC85F53 /* FilterCraftApp.swift */; };
+		EC1D751899385F1F68F6F1E5 /* FilterButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C2D547954650C24A26ACBA /* FilterButton.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B770127BCF74FDE922AE4B17 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BA9362802BB9803AD713DC0D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 64D40B35F0FFC82D14945A2E;
+			remoteInfo = "FilterCraft-macOS";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1B0C188778998F25C34C5FAE /* InspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectorView.swift; sourceTree = "<group>"; };
+		32C2D547954650C24A26ACBA /* FilterButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterButton.swift; sourceTree = "<group>"; };
+		33D792C734D275038FC85F53 /* FilterCraftApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCraftApp.swift; sourceTree = "<group>"; };
+		3969B320B9D0C2013E0614E8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		43947E7E331794F6E820ACA8 /* ImageCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCanvasView.swift; sourceTree = "<group>"; };
+		4BF48363C6B25E568E1D4F1D /* FilterCraft-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "FilterCraft-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A792F4B87FF98519B60C8DE /* ToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarView.swift; sourceTree = "<group>"; };
+		94EC4E9E25155E81B6DD3C67 /* FilterCraftCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FilterCraftCore; path = ../../Packages/FilterCraftCore; sourceTree = SOURCE_ROOT; };
+		B853E1268C6AFAF49286FA13 /* FilterCraft-macOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "FilterCraft-macOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6B59C5F69B34BAAFB943466 /* DropZoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropZoneView.swift; sourceTree = "<group>"; };
+		CD1AD7D238CF862A4B79CA25 /* AdjustmentControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjustmentControlsView.swift; sourceTree = "<group>"; };
+		CF807B9F389C0AA53FECDB90 /* FilterCraftCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCraftCommands.swift; sourceTree = "<group>"; };
+		E32202F14552A629FDB0519B /* ViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewTests.swift; sourceTree = "<group>"; };
+		EEF4D1A502E994C9CF265F2B /* ImagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
+		EF9BBB910A8A598B44BD7C06 /* FilterCraftMacOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCraftMacOSTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		48569CCA906DF9756A0E82ED /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0920E39F98433BE1AB4943 /* FilterCraftCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		09487DDF735D38ABF088725E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4BF48363C6B25E568E1D4F1D /* FilterCraft-macOS.app */,
+				B853E1268C6AFAF49286FA13 /* FilterCraft-macOSTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7283D8815088D033DC2910A1 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				94EC4E9E25155E81B6DD3C67 /* FilterCraftCore */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		8355C119E24C597E10FFB577 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CD1AD7D238CF862A4B79CA25 /* AdjustmentControlsView.swift */,
+				C6B59C5F69B34BAAFB943466 /* DropZoneView.swift */,
+				32C2D547954650C24A26ACBA /* FilterButton.swift */,
+				43947E7E331794F6E820ACA8 /* ImageCanvasView.swift */,
+				EEF4D1A502E994C9CF265F2B /* ImagePickerView.swift */,
+				1B0C188778998F25C34C5FAE /* InspectorView.swift */,
+				7A792F4B87FF98519B60C8DE /* ToolbarView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A53ECCD4962C9251EBC808FF /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				3969B320B9D0C2013E0614E8 /* ContentView.swift */,
+				33D792C734D275038FC85F53 /* FilterCraftApp.swift */,
+				CF807B9F389C0AA53FECDB90 /* FilterCraftCommands.swift */,
+				8355C119E24C597E10FFB577 /* Views */,
+			);
+			name = Sources;
+			path = "FilterCraft-macOS/Sources";
+			sourceTree = "<group>";
+		};
+		E261CF94EFCEA402DEE3956F /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				EF9BBB910A8A598B44BD7C06 /* FilterCraftMacOSTests.swift */,
+				E32202F14552A629FDB0519B /* ViewTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		F4F7EB9EAF8EE25EA46B0972 = {
+			isa = PBXGroup;
+			children = (
+				7283D8815088D033DC2910A1 /* Packages */,
+				A53ECCD4962C9251EBC808FF /* Sources */,
+				E261CF94EFCEA402DEE3956F /* Tests */,
+				09487DDF735D38ABF088725E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		474691A239AC89EA412AAD24 /* FilterCraft-macOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8828FDF28D0E95B4394C90E0 /* Build configuration list for PBXNativeTarget "FilterCraft-macOSTests" */;
+			buildPhases = (
+				290F219D156AF81B8B068CED /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3A57F8185AD91C07D12585C3 /* PBXTargetDependency */,
+			);
+			name = "FilterCraft-macOSTests";
+			packageProductDependencies = (
+			);
+			productName = "FilterCraft-macOSTests";
+			productReference = B853E1268C6AFAF49286FA13 /* FilterCraft-macOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		64D40B35F0FFC82D14945A2E /* FilterCraft-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E5DDCD90D3FA523745BD2F31 /* Build configuration list for PBXNativeTarget "FilterCraft-macOS" */;
+			buildPhases = (
+				1D5097D0D3F02C4DFC33A83F /* Sources */,
+				48569CCA906DF9756A0E82ED /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "FilterCraft-macOS";
+			packageProductDependencies = (
+				FFE7350BD47E16890336A0DC /* FilterCraftCore */,
+			);
+			productName = "FilterCraft-macOS";
+			productReference = 4BF48363C6B25E568E1D4F1D /* FilterCraft-macOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BA9362802BB9803AD713DC0D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					64D40B35F0FFC82D14945A2E = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 4EA63A3695F8685DB41F2E25 /* Build configuration list for PBXProject "FilterCraft-macOS" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F4F7EB9EAF8EE25EA46B0972;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				82E4D229B6CFD90D8E9BEA57 /* XCLocalSwiftPackageReference "../../Packages/FilterCraftCore" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				64D40B35F0FFC82D14945A2E /* FilterCraft-macOS */,
+				474691A239AC89EA412AAD24 /* FilterCraft-macOSTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1D5097D0D3F02C4DFC33A83F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				826FD1B9EAC24F1C3F9AE0DD /* AdjustmentControlsView.swift in Sources */,
+				992EA4CB485E5E199190E41B /* ContentView.swift in Sources */,
+				5ECCEAB2ACF3FC4BF36749F6 /* DropZoneView.swift in Sources */,
+				EC1D751899385F1F68F6F1E5 /* FilterButton.swift in Sources */,
+				BE48156663A4EC0EAB7E66C9 /* FilterCraftApp.swift in Sources */,
+				4E831A1DF577E4F94632CF51 /* FilterCraftCommands.swift in Sources */,
+				B597C4C51655DC19F739208E /* ImageCanvasView.swift in Sources */,
+				3554613802619DDAA43D2821 /* ImagePickerView.swift in Sources */,
+				A964288F54610F9D1AD7D430 /* InspectorView.swift in Sources */,
+				0833DBDFA2DF415888328482 /* ToolbarView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		290F219D156AF81B8B068CED /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9BED8A9A7145946B205FA4A5 /* FilterCraftMacOSTests.swift in Sources */,
+				4E2E04E287B089A4CC51264B /* ViewTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3A57F8185AD91C07D12585C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 64D40B35F0FFC82D14945A2E /* FilterCraft-macOS */;
+			targetProxy = B770127BCF74FDE922AE4B17 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0CB181D5D218D4D0A959A9F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		35FADE3C698230333FB59895 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		4B11E6F560E64ED82D703D9A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "FilterCraft-macOS/FilterCraft-macOS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "FilterCraft-macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.filtercraft.macos;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6C0F6F017ED7E5FF44575E4C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.filtercraft.FilterCraft-macOSTests";
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FilterCraft-macOS.app/Contents/MacOS/FilterCraft-macOS";
+			};
+			name = Debug;
+		};
+		829EEA14D1A2EF1C6AD9747A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "FilterCraft-macOS/FilterCraft-macOS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "FilterCraft-macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.filtercraft.macos;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		C5A5EC5BEC8B18A4A02FC82B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.filtercraft.FilterCraft-macOSTests";
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FilterCraft-macOS.app/Contents/MacOS/FilterCraft-macOS";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4EA63A3695F8685DB41F2E25 /* Build configuration list for PBXProject "FilterCraft-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				35FADE3C698230333FB59895 /* Debug */,
+				0CB181D5D218D4D0A959A9F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8828FDF28D0E95B4394C90E0 /* Build configuration list for PBXNativeTarget "FilterCraft-macOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6C0F6F017ED7E5FF44575E4C /* Debug */,
+				C5A5EC5BEC8B18A4A02FC82B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E5DDCD90D3FA523745BD2F31 /* Build configuration list for PBXNativeTarget "FilterCraft-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B11E6F560E64ED82D703D9A /* Debug */,
+				829EEA14D1A2EF1C6AD9747A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		82E4D229B6CFD90D8E9BEA57 /* XCLocalSwiftPackageReference "../../Packages/FilterCraftCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../Packages/FilterCraftCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FFE7350BD47E16890336A0DC /* FilterCraftCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FilterCraftCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = BA9362802BB9803AD713DC0D /* Project object */;
+}

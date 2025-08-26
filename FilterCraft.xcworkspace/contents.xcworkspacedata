@@ -7,4 +7,7 @@
    <FileRef
       location = "group:Packages/FilterCraftCore">
    </FileRef>
+   <FileRef
+      location = "group:Apps/FilterCraft-macOS/FilterCraft-macOS.xcodeproj">
+   </FileRef>
 </Workspace>
