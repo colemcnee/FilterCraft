@@ -88,6 +88,9 @@ public class EditSession: ObservableObject {
         }
     }
     
+    /// Filter currently being processed (for immediate UI feedback)
+    @Published public private(set) var pendingFilter: FilterType?
+    
     /// Current preview image for display
     @Published public private(set) var previewImage: CIImage?
     
@@ -159,6 +162,9 @@ public class EditSession: ObservableObject {
     
     /// Apply a filter with specified intensity
     public func applyFilter(_ filterType: FilterType, intensity: Float = 1.0) {
+        // Set pending filter immediately for UI feedback
+        pendingFilter = filterType
+        
         let newFilter = AppliedFilter(filterType: filterType, intensity: intensity)
         appliedFilter = newFilter
     }
@@ -250,6 +256,7 @@ public class EditSession: ObservableObject {
     private func resetEditsInternal() {
         adjustments = ImageAdjustments()
         appliedFilter = nil
+        pendingFilter = nil
         fullResolutionImage = originalImage
     }
     
@@ -277,6 +284,8 @@ public class EditSession: ObservableObject {
             if !Task.isCancelled {
                 previewImage = processedPreview
                 processingState = .completed
+                // Clear pending filter when processing is complete
+                pendingFilter = nil
                 sessionStats.incrementOperationCount()
             }
         }

@@ -1,26 +1,16 @@
 import SwiftUI
 import AppKit
+import UniformTypeIdentifiers
 
-struct ImagePickerView: NSViewControllerRepresentable {
+struct ImagePickerView: View {
     let onImageSelected: (NSImage) -> Void
+    @Environment(\.dismiss) private var dismiss
     
-    func makeNSViewController(context: Context) -> NSViewController {
-        let controller = ImagePickerViewController()
-        controller.onImageSelected = onImageSelected
-        return controller
-    }
-    
-    func updateNSViewController(_ nsViewController: NSViewController, context: Context) {
-        // No updates needed
-    }
-}
-
-class ImagePickerViewController: NSViewController {
-    var onImageSelected: ((NSImage) -> Void)?
-    
-    override func viewDidAppear() {
-        super.viewDidAppear()
-        presentImagePicker()
+    var body: some View {
+        Text("Selecting image...")
+            .onAppear {
+                presentImagePicker()
+            }
     }
     
     private func presentImagePicker() {
@@ -33,14 +23,14 @@ class ImagePickerViewController: NSViewController {
         openPanel.title = "Select Image"
         openPanel.prompt = "Choose"
         
-        openPanel.begin { [weak self] result in
+        openPanel.begin { result in
             DispatchQueue.main.async {
                 if result == .OK, 
                    let url = openPanel.url,
                    let image = NSImage(contentsOf: url) {
-                    self?.onImageSelected?(image)
+                    onImageSelected(image)
                 }
-                self?.dismiss(nil)
+                dismiss()
             }
         }
     }

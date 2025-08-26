@@ -142,7 +142,7 @@ struct ContentView: View {
                     ForEach(FilterType.allCases) { filterType in
                         FilterButton(
                             filterType: filterType,
-                            isSelected: editSession.appliedFilter?.filterType == filterType,
+                            isSelected: editSession.appliedFilter?.filterType == filterType || editSession.pendingFilter == filterType,
                             isProcessing: editSession.processingState != .idle && editSession.processingState != .completed
                         ) {
                             editSession.applyFilter(filterType, intensity: filterType.defaultIntensity)

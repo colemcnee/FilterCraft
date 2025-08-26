@@ -1,12 +1,13 @@
 import SwiftUI
 import FilterCraftCore
 import Combine
+import AppKit
+import UniformTypeIdentifiers
 
 @MainActor
 struct ContentView: View {
     @StateObject private var editSession = EditSession()
     @State private var selectedImage: NSImage?
-    @State private var showingImagePicker = false
     @State private var dragIsActive = false
     @State private var selectedFilterType: FilterType = .none
     @State private var showingBeforeAfter = false
@@ -42,11 +43,6 @@ struct ContentView: View {
                 onSaveImage: saveImage,
                 onReset: resetEdits
             )
-        }
-        .sheet(isPresented: $showingImagePicker) {
-            ImagePickerView { image in
-                loadImage(image)
-            }
         }
     }
     
@@ -129,7 +125,7 @@ struct ContentView: View {
                 DropZoneView(
                     dragIsActive: $dragIsActive,
                     onImageDropped: loadImageFromURL,
-                    onOpenClicked: { showingImagePicker = true }
+                    onOpenClicked: openImage
                 )
             }
         }
@@ -151,7 +147,24 @@ struct ContentView: View {
     // MARK: - Actions
     
     private func openImage() {
-        showingImagePicker = true
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.canCreateDirectories = false
+        openPanel.canChooseFiles = true
+        openPanel.allowedContentTypes = [.image, .jpeg, .png, .heif, .tiff, .gif]
+        openPanel.title = "Select Image"
+        openPanel.prompt = "Choose"
+        
+        openPanel.begin { result in
+            if result == .OK,
+               let url = openPanel.url,
+               let image = NSImage(contentsOf: url) {
+                DispatchQueue.main.async {
+                    loadImage(image)
+                }
+            }
+        }
     }
     
     private func saveImage() {
