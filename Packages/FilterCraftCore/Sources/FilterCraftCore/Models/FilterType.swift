@@ -12,7 +12,7 @@ public enum FilterCategory: String, CaseIterable {
 }
 
 /// Represents the different types of photo filters available in FilterCraft
-public enum FilterType: String, CaseIterable, Identifiable {
+public enum FilterType: String, CaseIterable, Identifiable, Sendable {
     case none = "none"
     case vintage = "vintage"
     case blackAndWhite = "blackAndWhite"

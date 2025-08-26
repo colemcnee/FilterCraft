@@ -88,7 +88,7 @@ public enum AdjustmentType: String, CaseIterable, Identifiable {
 }
 
 /// Represents image adjustments that can be applied to photos
-public struct ImageAdjustments: Equatable {
+public struct ImageAdjustments: Equatable, Sendable {
     public var brightness: Float
     public var contrast: Float
     public var saturation: Float

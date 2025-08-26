@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents a filter that has been applied to an image with specific parameters
-public struct AppliedFilter: Identifiable, Equatable {
+public struct AppliedFilter: Identifiable, Equatable, Sendable {
     /// Unique identifier for this applied filter
     public let id: UUID
     
