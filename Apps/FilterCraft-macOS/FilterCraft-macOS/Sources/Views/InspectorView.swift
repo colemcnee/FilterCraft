@@ -76,38 +76,71 @@ struct InspectorView: View {
             Text("Adjustments")
                 .font(.headline)
             
-            VStack(alignment: .leading, spacing: 4) {
-                if editSession.adjustments.hasAdjustments {
-                    if editSession.adjustments.brightness != 0 {
-                        InfoRow(label: "Brightness", value: formatAdjustment(editSession.adjustments.brightness))
+            VStack(alignment: .leading, spacing: 8) {
+                // Base adjustments from filter
+                if editSession.baseAdjustments.hasAdjustments {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("From Filter")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.blue)
+                        
+                        adjustmentRows(for: editSession.baseAdjustments, color: .blue)
                     }
-                    if editSession.adjustments.contrast != 0 {
-                        InfoRow(label: "Contrast", value: formatAdjustment(editSession.adjustments.contrast))
+                }
+                
+                // User manual adjustments
+                if editSession.userAdjustments.hasAdjustments {
+                    if editSession.baseAdjustments.hasAdjustments {
+                        Divider()
+                            .padding(.vertical, 2)
                     }
-                    if editSession.adjustments.saturation != 0 {
-                        InfoRow(label: "Saturation", value: formatAdjustment(editSession.adjustments.saturation))
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Manual")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.secondary)
+                        
+                        adjustmentRows(for: editSession.userAdjustments, color: .primary)
                     }
-                    if editSession.adjustments.exposure != 0 {
-                        InfoRow(label: "Exposure", value: formatAdjustment(editSession.adjustments.exposure))
-                    }
-                    if editSession.adjustments.highlights != 0 {
-                        InfoRow(label: "Highlights", value: formatAdjustment(editSession.adjustments.highlights))
-                    }
-                    if editSession.adjustments.shadows != 0 {
-                        InfoRow(label: "Shadows", value: formatAdjustment(editSession.adjustments.shadows))
-                    }
-                    if editSession.adjustments.warmth != 0 {
-                        InfoRow(label: "Warmth", value: formatAdjustment(editSession.adjustments.warmth))
-                    }
-                    if editSession.adjustments.tint != 0 {
-                        InfoRow(label: "Tint", value: formatAdjustment(editSession.adjustments.tint))
-                    }
-                } else {
+                }
+                
+                // No adjustments message
+                if !editSession.baseAdjustments.hasAdjustments && !editSession.userAdjustments.hasAdjustments {
                     Text("No adjustments applied")
                         .foregroundColor(.secondary)
                         .font(.caption)
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func adjustmentRows(for adjustments: ImageAdjustments, color: Color) -> some View {
+        if adjustments.brightness != 0 {
+            InfoRow(label: "Brightness", value: formatAdjustment(adjustments.brightness), valueColor: color)
+        }
+        if adjustments.contrast != 0 {
+            InfoRow(label: "Contrast", value: formatAdjustment(adjustments.contrast), valueColor: color)
+        }
+        if adjustments.saturation != 0 {
+            InfoRow(label: "Saturation", value: formatAdjustment(adjustments.saturation), valueColor: color)
+        }
+        if adjustments.exposure != 0 {
+            InfoRow(label: "Exposure", value: formatAdjustment(adjustments.exposure), valueColor: color)
+        }
+        if adjustments.highlights != 0 {
+            InfoRow(label: "Highlights", value: formatAdjustment(adjustments.highlights), valueColor: color)
+        }
+        if adjustments.shadows != 0 {
+            InfoRow(label: "Shadows", value: formatAdjustment(adjustments.shadows), valueColor: color)
+        }
+        if adjustments.warmth != 0 {
+            InfoRow(label: "Warmth", value: formatAdjustment(adjustments.warmth), valueColor: color)
+        }
+        if adjustments.tint != 0 {
+            InfoRow(label: "Tint", value: formatAdjustment(adjustments.tint), valueColor: color)
         }
     }
     
@@ -177,6 +210,13 @@ struct InspectorView: View {
 struct InfoRow: View {
     let label: String
     let value: String
+    let valueColor: Color
+    
+    init(label: String, value: String, valueColor: Color = .primary) {
+        self.label = label
+        self.value = value
+        self.valueColor = valueColor
+    }
     
     var body: some View {
         HStack {
@@ -186,6 +226,7 @@ struct InfoRow: View {
             Spacer()
             Text(value)
                 .font(.system(.caption, design: .monospaced))
+                .foregroundColor(valueColor)
         }
     }
 }

@@ -149,7 +149,6 @@ struct ExportSheet: View {
                 let imageData = await editSession.exportImage(format: selectedFormat, quality: Float(quality))
                 await MainActor.run {
                     exportedImageData = imageData
-                    dismiss()
                 }
             }
         }

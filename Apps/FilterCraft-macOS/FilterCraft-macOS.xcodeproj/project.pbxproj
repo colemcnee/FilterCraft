@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0833DBDFA2DF415888328482 /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A792F4B87FF98519B60C8DE /* ToolbarView.swift */; };
 		3554613802619DDAA43D2821 /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF4D1A502E994C9CF265F2B /* ImagePickerView.swift */; };
+		3D30BB4CB5BB1F3A34BB60DC /* FilterLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7554D659742059AC17A6EAD /* FilterLibraryView.swift */; };
 		4E2E04E287B089A4CC51264B /* ViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E32202F14552A629FDB0519B /* ViewTests.swift */; };
 		4E831A1DF577E4F94632CF51 /* FilterCraftCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF807B9F389C0AA53FECDB90 /* FilterCraftCommands.swift */; };
 		5ECCEAB2ACF3FC4BF36749F6 /* DropZoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B59C5F69B34BAAFB943466 /* DropZoneView.swift */; };
@@ -19,6 +20,7 @@
 		AA0920E39F98433BE1AB4943 /* FilterCraftCore in Frameworks */ = {isa = PBXBuildFile; productRef = FFE7350BD47E16890336A0DC /* FilterCraftCore */; };
 		B597C4C51655DC19F739208E /* ImageCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43947E7E331794F6E820ACA8 /* ImageCanvasView.swift */; };
 		BE48156663A4EC0EAB7E66C9 /* FilterCraftApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D792C734D275038FC85F53 /* FilterCraftApp.swift */; };
+		C1A97669CAD41A41AC4446B8 /* MainImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832C1F224538FAF958D771C6 /* MainImageView.swift */; };
 		EC1D751899385F1F68F6F1E5 /* FilterButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C2D547954650C24A26ACBA /* FilterButton.swift */; };
 /* End PBXBuildFile section */
 
@@ -40,7 +42,9 @@
 		43947E7E331794F6E820ACA8 /* ImageCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCanvasView.swift; sourceTree = "<group>"; };
 		4BF48363C6B25E568E1D4F1D /* FilterCraft-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "FilterCraft-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A792F4B87FF98519B60C8DE /* ToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarView.swift; sourceTree = "<group>"; };
+		832C1F224538FAF958D771C6 /* MainImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainImageView.swift; sourceTree = "<group>"; };
 		94EC4E9E25155E81B6DD3C67 /* FilterCraftCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FilterCraftCore; path = ../../Packages/FilterCraftCore; sourceTree = SOURCE_ROOT; };
+		A7554D659742059AC17A6EAD /* FilterLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterLibraryView.swift; sourceTree = "<group>"; };
 		B853E1268C6AFAF49286FA13 /* FilterCraft-macOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "FilterCraft-macOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6B59C5F69B34BAAFB943466 /* DropZoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropZoneView.swift; sourceTree = "<group>"; };
 		CD1AD7D238CF862A4B79CA25 /* AdjustmentControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjustmentControlsView.swift; sourceTree = "<group>"; };
@@ -85,9 +89,11 @@
 				CD1AD7D238CF862A4B79CA25 /* AdjustmentControlsView.swift */,
 				C6B59C5F69B34BAAFB943466 /* DropZoneView.swift */,
 				32C2D547954650C24A26ACBA /* FilterButton.swift */,
+				A7554D659742059AC17A6EAD /* FilterLibraryView.swift */,
 				43947E7E331794F6E820ACA8 /* ImageCanvasView.swift */,
 				EEF4D1A502E994C9CF265F2B /* ImagePickerView.swift */,
 				1B0C188778998F25C34C5FAE /* InspectorView.swift */,
+				832C1F224538FAF958D771C6 /* MainImageView.swift */,
 				7A792F4B87FF98519B60C8DE /* ToolbarView.swift */,
 			);
 			path = Views;
@@ -213,9 +219,11 @@
 				EC1D751899385F1F68F6F1E5 /* FilterButton.swift in Sources */,
 				BE48156663A4EC0EAB7E66C9 /* FilterCraftApp.swift in Sources */,
 				4E831A1DF577E4F94632CF51 /* FilterCraftCommands.swift in Sources */,
+				3D30BB4CB5BB1F3A34BB60DC /* FilterLibraryView.swift in Sources */,
 				B597C4C51655DC19F739208E /* ImageCanvasView.swift in Sources */,
 				3554613802619DDAA43D2821 /* ImagePickerView.swift in Sources */,
 				A964288F54610F9D1AD7D430 /* InspectorView.swift in Sources */,
+				C1A97669CAD41A41AC4446B8 /* MainImageView.swift in Sources */,
 				0833DBDFA2DF415888328482 /* ToolbarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -23,12 +23,21 @@ struct ContentView: View {
                     .frame(minWidth: 250, maxWidth: 350)
                 
                 // Center Panel - Image Canvas
-                centerPanel
-                    .frame(minWidth: 400)
+                MainImageView(
+                    editSession: editSession,
+                    showingBeforeAfter: $showingBeforeAfter,
+                    zoomScale: $zoomScale,
+                    dragIsActive: $dragIsActive,
+                    onImageDropped: loadImageFromURL,
+                    onOpenClicked: openImage
+                )
+                .frame(minWidth: 400)
                 
                 // Right Panel - Inspector (Optional)
                 if showingInspector {
-                    rightPanel
+                    InspectorView(editSession: editSession)
+                        .padding()
+                        .background(Color(NSColor.controlBackgroundColor))
                         .frame(minWidth: 200, maxWidth: 300)
                 }
             }
@@ -49,30 +58,10 @@ struct ContentView: View {
     private var leftPanel: some View {
         VStack(spacing: 0) {
             // Filters Section
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Filters")
-                    .font(.headline)
-                    .padding(.horizontal)
-                
-                ScrollView {
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 8) {
-                        ForEach(FilterType.allCases, id: \.self) { filterType in
-                            FilterButton(
-                                filterType: filterType,
-                                isSelected: selectedFilterType == filterType,
-                                action: {
-                                    selectedFilterType = filterType
-                                    editSession.applyFilter(filterType)
-                                }
-                            )
-                        }
-                    }
-                    .padding()
-                }
-            }
+            FilterLibraryView(
+                editSession: editSession,
+                selectedFilterType: $selectedFilterType
+            )
             .frame(maxHeight: .infinity)
             
             Divider()
@@ -92,7 +81,7 @@ struct ContentView: View {
                     .padding(.horizontal)
                     
                     ScrollView {
-                        AdjustmentControlsView(adjustments: $editSession.adjustments)
+                        AdjustmentControlsView(editSession: editSession)
                     }
                 }
                 .frame(maxHeight: .infinity)
@@ -109,38 +98,6 @@ struct ContentView: View {
                 .padding()
             }
         }
-        .background(Color(NSColor.controlBackgroundColor))
-    }
-    
-    private var centerPanel: some View {
-        ZStack {
-            if let previewImage = editSession.previewImage {
-                ImageCanvasView(
-                    image: previewImage,
-                    originalImage: showingBeforeAfter ? editSession.originalImage : nil,
-                    zoomScale: $zoomScale,
-                    showingBeforeAfter: $showingBeforeAfter
-                )
-            } else {
-                DropZoneView(
-                    dragIsActive: $dragIsActive,
-                    onImageDropped: loadImageFromURL,
-                    onOpenClicked: openImage
-                )
-            }
-        }
-        .background(Color(NSColor.textBackgroundColor))
-        .onDrop(of: [.image], isTargeted: $dragIsActive) { providers in
-            handleImageDrop(providers)
-        }
-    }
-    
-    private var rightPanel: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            InspectorView(editSession: editSession)
-            Spacer()
-        }
-        .padding()
         .background(Color(NSColor.controlBackgroundColor))
     }
     
@@ -205,22 +162,6 @@ struct ContentView: View {
         }
     }
     
-    private func handleImageDrop(_ providers: [NSItemProvider]) -> Bool {
-        guard let provider = providers.first else { return false }
-        
-        if provider.canLoadObject(ofClass: NSImage.self) {
-            provider.loadObject(ofClass: NSImage.self) { image, _ in
-                if let nsImage = image as? NSImage {
-                    DispatchQueue.main.async {
-                        loadImage(nsImage)
-                    }
-                }
-            }
-            return true
-        }
-        
-        return false
-    }
     
     private func exportImage(to url: URL) async {
         let format: ImageExportFormat
