@@ -1,0 +1,392 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_15.1.app/Contents/Developer
+
+jobs:
+  validate-release:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Validate version format
+      id: version
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION="${{ github.ref_name }}"
+        fi
+        
+        if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+          echo "❌ Invalid version format: $VERSION"
+          echo "Expected format: v1.0.0 or v1.0.0-beta"
+          exit 1
+        fi
+        
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        
+        if [[ "$VERSION" =~ -[a-zA-Z] ]]; then
+          echo "prerelease=true" >> $GITHUB_OUTPUT
+        else
+          echo "prerelease=false" >> $GITHUB_OUTPUT
+        fi
+        
+        echo "✅ Version validated: $VERSION"
+    
+    - name: Check if version exists
+      run: |
+        VERSION="${{ steps.version.outputs.version }}"
+        if git rev-parse "$VERSION" >/dev/null 2>&1; then
+          echo "❌ Version $VERSION already exists"
+          exit 1
+        fi
+        echo "✅ Version $VERSION is new"
+
+  build-ios:
+    name: Build iOS Release
+    runs-on: macos-14
+    needs: validate-release
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Xcode
+      run: sudo xcode-select -s /Applications/Xcode_15.1.app/Contents/Developer
+    
+    - name: Cache derived data
+      uses: actions/cache@v4
+      with:
+        path: ~/Library/Developer/Xcode/DerivedData
+        key: ${{ runner.os }}-ios-release-${{ hashFiles('**/*.pbxproj') }}
+        restore-keys: |
+          ${{ runner.os }}-ios-release-
+    
+    - name: Update version number
+      run: |
+        VERSION="${{ needs.validate-release.outputs.version }}"
+        VERSION_NUMBER="${VERSION#v}"
+        
+        # Update iOS app version
+        agvtool new-marketing-version "$VERSION_NUMBER" || true
+        agvtool new-version -all "${{ github.run_number }}" || true
+    
+    - name: Build iOS app for release
+      run: |
+        xcodebuild archive \
+          -scheme FilterCraft-iOS \
+          -destination "generic/platform=iOS" \
+          -archivePath "FilterCraft-iOS.xcarchive" \
+          -configuration Release \
+          -allowProvisioningUpdates \
+          CODE_SIGNING_ALLOWED=NO \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGN_IDENTITY="" \
+          PROVISIONING_PROFILE=""
+    
+    - name: Export iOS app
+      run: |
+        # Create export options plist
+        cat > ExportOptions.plist << EOF
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>method</key>
+            <string>development</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+        </dict>
+        </plist>
+        EOF
+        
+        xcodebuild -exportArchive \
+          -archivePath "FilterCraft-iOS.xcarchive" \
+          -exportPath "ios-export" \
+          -exportOptionsPlist ExportOptions.plist || true
+    
+    - name: Package iOS artifacts
+      run: |
+        mkdir -p release-artifacts
+        
+        # Archive the .xcarchive
+        tar -czf "release-artifacts/FilterCraft-iOS-${{ needs.validate-release.outputs.version }}.xcarchive.tar.gz" FilterCraft-iOS.xcarchive
+        
+        # Include export if successful
+        if [ -d "ios-export" ]; then
+          tar -czf "release-artifacts/FilterCraft-iOS-${{ needs.validate-release.outputs.version }}-export.tar.gz" ios-export
+        fi
+        
+        # Create build info
+        cat > release-artifacts/ios-build-info.txt << EOF
+        FilterCraft iOS Build Information
+        Version: ${{ needs.validate-release.outputs.version }}
+        Build Number: ${{ github.run_number }}
+        Commit: ${{ github.sha }}
+        Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        Xcode Version: $(xcodebuild -version | head -1)
+        EOF
+    
+    - name: Upload iOS artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-release-artifacts
+        path: release-artifacts/
+        retention-days: 30
+
+  build-macos:
+    name: Build macOS Release
+    runs-on: macos-14
+    needs: validate-release
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Xcode
+      run: sudo xcode-select -s /Applications/Xcode_15.1.app/Contents/Developer
+    
+    - name: Cache derived data
+      uses: actions/cache@v4
+      with:
+        path: ~/Library/Developer/Xcode/DerivedData
+        key: ${{ runner.os }}-macos-release-${{ hashFiles('**/*.pbxproj') }}
+        restore-keys: |
+          ${{ runner.os }}-macos-release-
+    
+    - name: Update version number
+      run: |
+        VERSION="${{ needs.validate-release.outputs.version }}"
+        VERSION_NUMBER="${VERSION#v}"
+        
+        # Update macOS app version  
+        agvtool new-marketing-version "$VERSION_NUMBER" || true
+        agvtool new-version -all "${{ github.run_number }}" || true
+    
+    - name: Build macOS app for release
+      run: |
+        xcodebuild archive \
+          -scheme FilterCraft-macOS \
+          -destination "generic/platform=macOS" \
+          -archivePath "FilterCraft-macOS.xcarchive" \
+          -configuration Release
+    
+    - name: Export macOS app
+      run: |
+        # Create export options plist
+        cat > ExportOptions.plist << EOF
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>method</key>
+            <string>developer-id</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+        </dict>
+        </plist>
+        EOF
+        
+        xcodebuild -exportArchive \
+          -archivePath "FilterCraft-macOS.xcarchive" \
+          -exportPath "macos-export" \
+          -exportOptionsPlist ExportOptions.plist || true
+    
+    - name: Package macOS artifacts
+      run: |
+        mkdir -p release-artifacts
+        
+        # Archive the .xcarchive
+        tar -czf "release-artifacts/FilterCraft-macOS-${{ needs.validate-release.outputs.version }}.xcarchive.tar.gz" FilterCraft-macOS.xcarchive
+        
+        # Package exported app if successful
+        if [ -d "macos-export" ]; then
+          cd macos-export
+          if [ -f "FilterCraft.app" ]; then
+            zip -r "../release-artifacts/FilterCraft-macOS-${{ needs.validate-release.outputs.version }}.zip" FilterCraft.app
+          fi
+          cd ..
+        fi
+        
+        # Create build info
+        cat > release-artifacts/macos-build-info.txt << EOF
+        FilterCraft macOS Build Information
+        Version: ${{ needs.validate-release.outputs.version }}
+        Build Number: ${{ github.run_number }}
+        Commit: ${{ github.sha }}
+        Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        Xcode Version: $(xcodebuild -version | head -1)
+        EOF
+    
+    - name: Upload macOS artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-release-artifacts
+        path: release-artifacts/
+        retention-days: 30
+
+  generate-changelog:
+    name: Generate Release Notes
+    runs-on: ubuntu-latest
+    needs: validate-release
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Generate changelog
+      id: changelog
+      run: |
+        VERSION="${{ needs.validate-release.outputs.version }}"
+        
+        # Get previous tag
+        PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+        
+        echo "Generating changelog from $PREV_TAG to $VERSION"
+        
+        # Generate changelog from git commits
+        if [ -n "$PREV_TAG" ]; then
+          CHANGELOG=$(git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD --no-merges)
+        else
+          CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+        fi
+        
+        # Create formatted changelog
+        cat > changelog.md << EOF
+        # FilterCraft $VERSION
+        
+        ## Changes
+        
+        $CHANGELOG
+        
+        ## Technical Details
+        
+        - **Platforms**: iOS 16.0+, macOS 12.0+
+        - **Build**: ${{ github.run_number }}
+        - **Commit**: ${{ github.sha }}
+        - **Release Date**: $(date -u +"%Y-%m-%d")
+        
+        ## Installation
+        
+        ### iOS
+        - Download the iOS release archive
+        - Install via Xcode or Apple Configurator 2
+        
+        ### macOS  
+        - Download FilterCraft-macOS.zip
+        - Extract and move FilterCraft.app to Applications folder
+        - Run: \`xattr -d com.apple.quarantine /Applications/FilterCraft.app\`
+        
+        ## Verification
+        
+        All releases are built using GitHub Actions with reproducible builds.
+        Verify the build artifacts match the commit SHA: \`${{ github.sha }}\`
+        EOF
+        
+        # Output for GitHub release
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        cat changelog.md >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+    
+    - name: Upload changelog
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-changelog
+        path: changelog.md
+        retention-days: 30
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate-release, build-ios, build-macos, generate-changelog]
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ./artifacts
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ needs.validate-release.outputs.version }}
+        name: FilterCraft ${{ needs.validate-release.outputs.version }}
+        body: ${{ needs.generate-changelog.outputs.changelog }}
+        prerelease: ${{ needs.validate-release.outputs.prerelease == 'true' }}
+        files: |
+          ./artifacts/ios-release-artifacts/*
+          ./artifacts/macos-release-artifacts/*
+          ./artifacts/release-changelog/*
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Notify release completion
+      run: |
+        echo "🎉 Release ${{ needs.validate-release.outputs.version }} created successfully!"
+        echo "📱 iOS artifacts: Available in release"
+        echo "💻 macOS artifacts: Available in release"
+        echo "📝 Changelog: Generated and attached"
+        
+        if [[ "${{ needs.validate-release.outputs.prerelease }}" == "true" ]]; then
+          echo "🧪 This is a pre-release"
+        else
+          echo "✅ This is a stable release"
+        fi
+
+  post-release:
+    name: Post-Release Tasks
+    runs-on: ubuntu-latest
+    needs: [validate-release, create-release]
+    if: needs.validate-release.outputs.prerelease == 'false'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    
+    - name: Update version tracking
+      run: |
+        VERSION="${{ needs.validate-release.outputs.version }}"
+        echo "Recording release $VERSION"
+        
+        # This would typically update version tracking files
+        # or trigger downstream processes
+        
+        echo "✅ Post-release tasks completed"
+    
+    - name: Trigger documentation update
+      run: |
+        # This would typically trigger documentation builds
+        # or notify documentation systems
+        echo "📚 Documentation update triggered"

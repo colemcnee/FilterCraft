@@ -1,0 +1,176 @@
+# SwiftLint Configuration for FilterCraft
+# Ensures consistent code style and quality across the project
+
+# Paths to include in linting
+included:
+  - Apps/
+  - Packages/FilterCraftCore/Sources/
+
+# Paths to exclude from linting  
+excluded:
+  - Apps/*/DerivedData/
+  - Apps/*/*.xcodeproj/
+  - Apps/*/Build/
+  - Packages/FilterCraftCore/.build/
+  - Packages/FilterCraftCore/Tests/
+  - .build/
+  - DerivedData/
+  - Carthage/
+  - Pods/
+  - .github/
+
+# Disable rules
+disabled_rules:
+  - todo # Allow TODO comments during development
+  - trailing_whitespace # Handled by editor
+  - vertical_whitespace_closing_braces # Personal preference
+
+# Opt-in rules (additional quality checks)
+opt_in_rules:
+  # Closure and function rules
+  - closure_spacing
+  - closure_end_indentation
+  - multiline_function_chains
+  - multiline_parameters
+  - multiline_arguments
+  
+  # Code organization
+  - sorted_imports
+  - vertical_parameter_alignment
+  - vertical_parameter_alignment_on_call
+  
+  # Performance and best practices
+  - empty_count
+  - empty_string
+  - first_where
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - contains_over_first_not_nil
+  - last_where
+  - reduce_into
+  
+  # Code clarity
+  - explicit_init
+  - explicit_type_interface
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - unused_optional_binding
+  
+  # Modern Swift features
+  - shorthand_operator
+  - operator_usage_whitespace
+  - prefer_self_type_over_type_of_self
+  
+  # Documentation and accessibility
+  - missing_docs
+  - accessibility_label_for_image
+
+# Configuration for specific rules
+line_length:
+  warning: 120
+  error: 150
+  ignores_function_declarations: true
+  ignores_comments: true
+  ignores_urls: true
+
+type_body_length:
+  warning: 300
+  error: 500
+
+function_body_length:
+  warning: 50
+  error: 100
+
+file_length:
+  warning: 400
+  error: 1000
+  ignore_comment_only_lines: true
+
+cyclomatic_complexity:
+  warning: 10
+  error: 20
+
+nesting:
+  type_level:
+    warning: 2
+    error: 3
+  statement_level:
+    warning: 5
+    error: 10
+
+# Identifier naming rules
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  max_length:
+    warning: 50
+    error: 60
+  excluded:
+    - id
+    - x
+    - y
+    - z
+    - i
+    - j
+    - k
+
+type_name:
+  min_length:
+    warning: 3
+    error: 2
+  max_length:
+    warning: 40
+    error: 50
+
+# Custom rules for FilterCraft
+custom_rules:
+  # Require explicit access control
+  explicit_access_control:
+    name: "Explicit Access Control"
+    regex: '(class|struct|enum|protocol|extension|func|var|let)\s+(?!public|internal|private|fileprivate)'
+    match_kinds:
+      - keyword
+    message: "Prefer explicit access control (public, internal, private, fileprivate)"
+    severity: warning
+  
+  # Discourage force unwrapping in production code
+  force_unwrapping_production:
+    name: "Avoid Force Unwrapping"
+    regex: '\!\s*(?!/[/*])'
+    match_kinds:
+      - identifier
+    message: "Avoid force unwrapping. Use optional binding or nil coalescing instead"
+    severity: warning
+  
+  # Require MARK comments for organization
+  missing_mark_comment:
+    name: "Missing MARK Comment"
+    regex: '(extension|class|struct|enum).*\{$'
+    match_kinds:
+      - keyword
+    message: "Consider adding MARK comments to organize code sections"
+    severity: warning
+  
+  # Discourage print statements in production
+  print_statement:
+    name: "Print Statement"
+    regex: '\bprint\s*\('
+    message: "Use proper logging instead of print statements"
+    severity: warning
+  
+  # Ensure proper documentation for public APIs
+  public_api_docs:
+    name: "Public API Documentation"
+    regex: 'public\s+(class|struct|enum|protocol|func|var|let)(?!\s*\/\/)'
+    message: "Public APIs should be documented"
+    severity: warning
+
+# Reporter configuration
+reporter: "github-actions-logging" # Works well with GitHub Actions
+
+# Only show errors and warnings (not info)
+strict: false
+
+# Allow SwiftLint to cache results for faster subsequent runs
+cache_path: ".swiftlint_cache"

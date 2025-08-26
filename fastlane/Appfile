@@ -1,0 +1,36 @@
+# Fastlane Appfile for FilterCraft
+# Configuration for Apple Developer Portal integration
+
+# Apple ID for App Store Connect
+apple_id(ENV["APPLE_ID"] || "developer@filtercraft.com")
+
+# Team ID for development team
+team_id(ENV["TEAM_ID"])
+
+# iTunes Connect Team ID (if different from development team)
+itunes_connect_team_id(ENV["ITUNES_CONNECT_TEAM_ID"] || ENV["TEAM_ID"])
+
+# iOS App Configuration
+for_platform :ios do
+  app_identifier(ENV["IOS_APP_IDENTIFIER"] || "com.filtercraft.ios")
+  
+  # For development builds
+  for_lane :build do
+    app_identifier("com.filtercraft.ios.dev")
+  end
+  
+  # For TestFlight builds
+  for_lane :deploy_testflight do
+    app_identifier("com.filtercraft.ios")
+  end
+end
+
+# macOS App Configuration  
+for_platform :mac do
+  app_identifier(ENV["MACOS_APP_IDENTIFIER"] || "com.filtercraft.macos")
+  
+  # For development builds
+  for_lane :build do
+    app_identifier("com.filtercraft.macos.dev")
+  end
+end

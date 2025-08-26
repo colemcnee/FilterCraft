@@ -1,0 +1,88 @@
+# FilterCraft Pre-commit Configuration
+# Ensures code quality before commits
+
+repos:
+  # Local hooks for Swift-specific checks
+  - repo: local
+    hooks:
+      # SwiftLint for code style enforcement
+      - id: swiftlint
+        name: SwiftLint
+        entry: swiftlint
+        language: system
+        files: \.swift$
+        args: [--strict, --config, .swiftlint.yml]
+        
+      # Swift package tests
+      - id: swift-package-test
+        name: Swift Package Tests
+        entry: bash -c 'cd Packages/FilterCraftCore && swift test'
+        language: system
+        pass_filenames: false
+        files: ^Packages/FilterCraftCore/.*\.swift$
+        
+      # Check for debug statements
+      - id: no-debug-statements
+        name: Check for debug statements
+        entry: bash -c 'if grep -r "print(" --include="*.swift" . --exclude-dir=Tests --exclude-dir=.build; then exit 1; fi'
+        language: system
+        pass_filenames: false
+        
+      # Check for TODO/FIXME in committed code
+      - id: check-todos
+        name: Check for TODO/FIXME
+        entry: bash -c 'if grep -r "TODO\|FIXME\|HACK" --include="*.swift" . --exclude-dir=.build; then echo "Warning: TODO/FIXME found in code"; fi'
+        language: system
+        pass_filenames: false
+        
+      # Ensure proper imports organization
+      - id: check-imports
+        name: Check import organization
+        entry: bash -c 'find . -name "*.swift" -not -path "./.build/*" -exec grep -l "import.*UIKit.*import.*Foundation\|import.*Foundation.*import.*UIKit" {} \; | while read file; do echo "Unorganized imports in $file"; done'
+        language: system
+        pass_filenames: false
+
+  # Generic file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      # Basic file checks
+      - id: trailing-whitespace
+        exclude: \.md$
+      - id: end-of-file-fixer
+        exclude: \.md$
+      - id: check-yaml
+        files: \.ya?ml$
+      - id: check-json
+        files: \.json$
+      - id: check-xml
+        files: \.xml$|\.plist$
+        
+      # Security checks
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+      
+      # Git checks
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # Additional security scanning
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: \.lock$|\.resolved$
+
+# Configuration
+default_stages: [commit]
+fail_fast: false
+
+# CI configuration
+ci:
+  autofix_prs: false
+  autoupdate_schedule: weekly
+  skip: []

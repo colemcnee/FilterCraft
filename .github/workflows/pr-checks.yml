@@ -1,0 +1,322 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [ main, develop ]
+  pull_request_review:
+    types: [submitted]
+
+concurrency:
+  group: pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    
+    steps:
+    - name: Checkout PR
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
+    
+    - name: Validate PR title
+      run: |
+        PR_TITLE="${{ github.event.pull_request.title }}"
+        
+        # Check for conventional commit format
+        if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|perf|test|chore|ci|build)(\(.+\))?\!?:\ .+ ]]; then
+          echo "❌ PR title doesn't follow conventional commit format"
+          echo "Expected: type(scope): description"
+          echo "Examples:"
+          echo "  feat: add new filter effect"
+          echo "  fix(ios): resolve memory leak in image processing" 
+          echo "  docs: update API documentation"
+          exit 1
+        fi
+        
+        echo "✅ PR title follows conventional commit format"
+    
+    - name: Validate PR description
+      run: |
+        PR_BODY="${{ github.event.pull_request.body }}"
+        
+        if [[ -z "$PR_BODY" || ${#PR_BODY} -lt 20 ]]; then
+          echo "❌ PR description is too short or missing"
+          echo "Please provide a meaningful description of your changes"
+          exit 1
+        fi
+        
+        # Check for required sections (basic check)
+        if [[ "$PR_BODY" =~ ## ]]; then
+          echo "✅ PR description has structured format"
+        else
+          echo "ℹ️  Consider adding structured sections (## Changes, ## Testing, etc.)"
+        fi
+    
+    - name: Check for breaking changes
+      run: |
+        PR_TITLE="${{ github.event.pull_request.title }}"
+        PR_BODY="${{ github.event.pull_request.body }}"
+        
+        if [[ "$PR_TITLE" =~ \! ]] || [[ "$PR_BODY" =~ "BREAKING CHANGE" ]]; then
+          echo "🚨 Breaking change detected"
+          echo "breaking_change=true" >> $GITHUB_ENV
+        else
+          echo "✅ No breaking changes detected"
+          echo "breaking_change=false" >> $GITHUB_ENV
+        fi
+    
+    - name: Analyze changed files
+      run: |
+        # Get list of changed files
+        git fetch origin ${{ github.base_ref }}
+        
+        CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+        
+        echo "Changed files:"
+        echo "$CHANGED_FILES"
+        
+        # Categorize changes
+        SWIFT_FILES=$(echo "$CHANGED_FILES" | grep "\.swift$" || true)
+        CONFIG_FILES=$(echo "$CHANGED_FILES" | grep -E "\.(yml|yaml|json|plist)$" || true)
+        DOC_FILES=$(echo "$CHANGED_FILES" | grep -E "\.(md|txt)$" || true)
+        
+        echo "swift_changes=$(echo "$SWIFT_FILES" | wc -l)" >> $GITHUB_ENV
+        echo "config_changes=$(echo "$CONFIG_FILES" | wc -l)" >> $GITHUB_ENV
+        echo "doc_changes=$(echo "$DOC_FILES" | wc -l)" >> $GITHUB_ENV
+    
+    - name: Check for large PRs
+      run: |
+        ADDITIONS=$(echo "${{ github.event.pull_request.additions }}")
+        DELETIONS=$(echo "${{ github.event.pull_request.deletions }}")
+        TOTAL_CHANGES=$((ADDITIONS + DELETIONS))
+        
+        echo "Changes: +$ADDITIONS/-$DELETIONS (total: $TOTAL_CHANGES)"
+        
+        if [ $TOTAL_CHANGES -gt 1000 ]; then
+          echo "🚨 Large PR detected ($TOTAL_CHANGES changes)"
+          echo "Consider breaking this into smaller PRs for easier review"
+          echo "large_pr=true" >> $GITHUB_ENV
+        else
+          echo "✅ PR size is reasonable"
+          echo "large_pr=false" >> $GITHUB_ENV
+        fi
+    
+    - name: Generate PR summary
+      run: |
+        cat >> $GITHUB_STEP_SUMMARY << EOF
+        # PR Analysis Summary
+        
+        ## 📊 Statistics
+        - **Swift files changed**: ${{ env.swift_changes }}
+        - **Config files changed**: ${{ env.config_changes }}
+        - **Documentation changed**: ${{ env.doc_changes }}
+        - **Total changes**: ${{ github.event.pull_request.additions }} additions, ${{ github.event.pull_request.deletions }} deletions
+        
+        ## 🔍 Validation Results
+        - **Title format**: ✅ Valid
+        - **Description**: $([ "${#{{ github.event.pull_request.body }}}" -gt 20 ] && echo "✅ Adequate" || echo "⚠️ Needs improvement")
+        - **Breaking changes**: $([ "${{ env.breaking_change }}" = "true" ] && echo "🚨 Yes" || echo "✅ None detected")
+        - **PR size**: $([ "${{ env.large_pr }}" = "true" ] && echo "⚠️ Large" || echo "✅ Reasonable")
+        
+        ## 📝 Recommendations
+        $([ "${{ env.breaking_change }}" = "true" ] && echo "- This PR contains breaking changes. Ensure proper migration documentation is included.")
+        $([ "${{ env.large_pr }}" = "true" ] && echo "- This is a large PR. Consider breaking it into smaller, focused changes.")
+        $([ "${{ env.swift_changes }}" -gt 0 ] && echo "- Swift code changes detected. Ensure tests are updated accordingly.")
+        
+        EOF
+
+  conflict-detection:
+    name: Merge Conflict Detection
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Check for merge conflicts
+      run: |
+        git fetch origin ${{ github.base_ref }}
+        
+        # Try to merge the base branch into the PR branch
+        if git merge-tree $(git merge-base HEAD origin/${{ github.base_ref }}) HEAD origin/${{ github.base_ref }} | grep -q "^<<<<<<< "; then
+          echo "❌ Merge conflicts detected"
+          echo "Please resolve conflicts with the base branch"
+          
+          echo "conflict_files<<EOF" >> $GITHUB_ENV
+          git merge-tree $(git merge-base HEAD origin/${{ github.base_ref }}) HEAD origin/${{ github.base_ref }} | grep -B1 "^<<<<<<< " | grep "^@@" | cut -d' ' -f3 >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          
+          exit 1
+        else
+          echo "✅ No merge conflicts detected"
+        fi
+    
+    - name: Check branch freshness
+      run: |
+        # Check how many commits behind the PR branch is
+        BEHIND_COUNT=$(git rev-list --count HEAD..origin/${{ github.base_ref }})
+        
+        echo "PR branch is $BEHIND_COUNT commits behind ${{ github.base_ref }}"
+        
+        if [ $BEHIND_COUNT -gt 10 ]; then
+          echo "⚠️  PR branch is significantly behind the base branch"
+          echo "Consider rebasing or merging the latest changes"
+        else
+          echo "✅ PR branch is reasonably up to date"
+        fi
+
+  automated-review:
+    name: Automated Code Review
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup review environment
+      run: |
+        git fetch origin ${{ github.base_ref }}
+        
+        # Get changed Swift files
+        CHANGED_SWIFT_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "\.swift$" || true)
+        echo "changed_swift_files<<EOF" >> $GITHUB_ENV
+        echo "$CHANGED_SWIFT_FILES" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+    
+    - name: Review code patterns
+      run: |
+        echo "🔍 Reviewing code patterns..."
+        
+        ISSUES_FOUND=0
+        
+        # Check for common issues in changed Swift files
+        while IFS= read -r file; do
+          if [ -n "$file" ] && [ -f "$file" ]; then
+            echo "Reviewing: $file"
+            
+            # Check for TODO/FIXME comments
+            if grep -n "TODO\|FIXME\|HACK" "$file"; then
+              echo "ℹ️  Found TODO/FIXME comments in $file"
+              ISSUES_FOUND=$((ISSUES_FOUND + 1))
+            fi
+            
+            # Check for force unwrapping
+            if grep -n "!" "$file" | grep -v "!=" | grep -v "!<" | grep -v "!>" | head -5; then
+              echo "⚠️  Potential force unwrapping found in $file"
+              ISSUES_FOUND=$((ISSUES_FOUND + 1))
+            fi
+            
+            # Check for print statements
+            if grep -n "print(" "$file"; then
+              echo "ℹ️  Print statements found in $file (consider using proper logging)"
+              ISSUES_FOUND=$((ISSUES_FOUND + 1))
+            fi
+            
+            # Check file length
+            LINE_COUNT=$(wc -l < "$file")
+            if [ $LINE_COUNT -gt 300 ]; then
+              echo "⚠️  Large file: $file ($LINE_COUNT lines)"
+              ISSUES_FOUND=$((ISSUES_FOUND + 1))
+            fi
+          fi
+        done <<< "${{ env.changed_swift_files }}"
+        
+        echo "Total issues found: $ISSUES_FOUND"
+        echo "issues_found=$ISSUES_FOUND" >> $GITHUB_ENV
+    
+    - name: Check test coverage
+      run: |
+        echo "🧪 Checking test coverage..."
+        
+        # Check if tests were added/modified
+        TEST_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -i test || true)
+        
+        if [ -n "$TEST_FILES" ]; then
+          echo "✅ Test files modified:"
+          echo "$TEST_FILES"
+        else
+          # Check if Swift files changed without corresponding test changes
+          if [ -n "${{ env.changed_swift_files }}" ]; then
+            echo "⚠️  Swift files changed but no test files modified"
+            echo "Consider adding tests for new functionality"
+          fi
+        fi
+    
+    - name: Generate review summary
+      run: |
+        cat >> $GITHUB_STEP_SUMMARY << EOF
+        # Automated Code Review
+        
+        ## 🔍 Review Results
+        - **Issues found**: ${{ env.issues_found }}
+        - **Files reviewed**: $(echo "${{ env.changed_swift_files }}" | wc -l)
+        - **Test changes**: $(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -i test | wc -l || echo "0")
+        
+        ## 📋 Common Issues Checked
+        - ✅ TODO/FIXME comments
+        - ✅ Force unwrapping patterns  
+        - ✅ Debug print statements
+        - ✅ File size limits
+        - ✅ Test coverage
+        
+        ## 💡 Recommendations
+        $([ "${{ env.issues_found }}" -gt 0 ] && echo "Review the issues found above and consider addressing them before merging.")
+        $([ "${{ env.issues_found }}" -eq 0 ] && echo "No major issues detected. Code looks good!")
+        
+        EOF
+
+  required-checks-status:
+    name: Required Checks Status
+    runs-on: ubuntu-latest
+    needs: [pr-validation, conflict-detection, automated-review]
+    if: always() && github.event.pull_request.draft == false
+    
+    steps:
+    - name: Evaluate PR readiness
+      run: |
+        echo "📋 PR Readiness Summary"
+        echo "======================="
+        
+        PR_VALIDATION="${{ needs.pr-validation.result }}"
+        CONFLICT_CHECK="${{ needs.conflict-detection.result }}"
+        CODE_REVIEW="${{ needs.automated-review.result }}"
+        
+        echo "PR Validation: $PR_VALIDATION"
+        echo "Conflict Detection: $CONFLICT_CHECK"
+        echo "Automated Review: $CODE_REVIEW"
+        
+        READY=true
+        
+        if [[ "$PR_VALIDATION" == "failure" ]]; then
+          echo "❌ PR validation failed"
+          READY=false
+        fi
+        
+        if [[ "$CONFLICT_CHECK" == "failure" ]]; then
+          echo "❌ Merge conflicts detected"
+          READY=false
+        fi
+        
+        if [[ "$CODE_REVIEW" == "failure" ]]; then
+          echo "⚠️  Code review found issues"
+          # Don't fail on code review issues, just warn
+        fi
+        
+        if [[ "$READY" == "true" ]]; then
+          echo "✅ PR is ready for review"
+        else
+          echo "❌ PR needs attention before it can be merged"
+          exit 1
+        fi
