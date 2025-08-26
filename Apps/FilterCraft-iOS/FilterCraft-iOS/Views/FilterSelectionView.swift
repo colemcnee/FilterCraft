@@ -34,7 +34,6 @@ struct FilterSelectionView: View {
                 }
                 .padding(.horizontal)
             }
-            .contentMargins(.horizontal, 16)
         }
     }
 }

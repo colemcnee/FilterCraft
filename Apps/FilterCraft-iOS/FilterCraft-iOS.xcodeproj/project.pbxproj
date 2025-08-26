@@ -11,6 +11,11 @@
 		01000003294A5C7A00000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01000002294A5C7A00000001 /* ContentView.swift */; };
 		01000005294A5C7B00000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 01000004294A5C7B00000001 /* Assets.xcassets */; };
 		01000019294A5C7B00000001 /* FilterCraftCore in Frameworks */ = {isa = PBXBuildFile; productRef = 01000020294A5C7B00000001 /* FilterCraftCore */; };
+		49E70E112E5E1BD6003D5A2B /* FilterSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E0D2E5E1BD6003D5A2B /* FilterSelectionView.swift */; };
+		49E70E122E5E1BD6003D5A2B /* ImageDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E0E2E5E1BD6003D5A2B /* ImageDisplayView.swift */; };
+		49E70E132E5E1BD6003D5A2B /* AdjustmentControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E0B2E5E1BD6003D5A2B /* AdjustmentControlsView.swift */; };
+		49E70E142E5E1BD6003D5A2B /* PhotoPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E0F2E5E1BD6003D5A2B /* PhotoPickerView.swift */; };
+		49E70E152E5E1BD6003D5A2B /* ExportOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E0C2E5E1BD6003D5A2B /* ExportOptionsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +25,11 @@
 		01000009294A5C7B00000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0100000A294A5C7B00000001 /* FilterCraft-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "FilterCraft-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		01000021294A5C7B00000001 /* FilterCraftCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FilterCraftCore; path = ../../Packages/FilterCraftCore; sourceTree = "<group>"; };
+		49E70E0B2E5E1BD6003D5A2B /* AdjustmentControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjustmentControlsView.swift; sourceTree = "<group>"; };
+		49E70E0C2E5E1BD6003D5A2B /* ExportOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportOptionsView.swift; sourceTree = "<group>"; };
+		49E70E0D2E5E1BD6003D5A2B /* FilterSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSelectionView.swift; sourceTree = "<group>"; };
+		49E70E0E2E5E1BD6003D5A2B /* ImageDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDisplayView.swift; sourceTree = "<group>"; };
+		49E70E0F2E5E1BD6003D5A2B /* PhotoPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +59,7 @@
 				01000000294A5C7A00000001 /* FilterCraft_iOSApp.swift */,
 				01000002294A5C7A00000001 /* ContentView.swift */,
 				01000004294A5C7B00000001 /* Assets.xcassets */,
+				49E70E102E5E1BD6003D5A2B /* Views */,
 				01000009294A5C7B00000001 /* Info.plist */,
 			);
 			path = "FilterCraft-iOS";
@@ -68,6 +79,18 @@
 				01000021294A5C7B00000001 /* FilterCraftCore */,
 			);
 			name = Packages;
+			sourceTree = "<group>";
+		};
+		49E70E102E5E1BD6003D5A2B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				49E70E0B2E5E1BD6003D5A2B /* AdjustmentControlsView.swift */,
+				49E70E0C2E5E1BD6003D5A2B /* ExportOptionsView.swift */,
+				49E70E0D2E5E1BD6003D5A2B /* FilterSelectionView.swift */,
+				49E70E0E2E5E1BD6003D5A2B /* ImageDisplayView.swift */,
+				49E70E0F2E5E1BD6003D5A2B /* PhotoPickerView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -146,6 +169,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				01000003294A5C7A00000001 /* ContentView.swift in Sources */,
+				49E70E112E5E1BD6003D5A2B /* FilterSelectionView.swift in Sources */,
+				49E70E122E5E1BD6003D5A2B /* ImageDisplayView.swift in Sources */,
+				49E70E132E5E1BD6003D5A2B /* AdjustmentControlsView.swift in Sources */,
+				49E70E142E5E1BD6003D5A2B /* PhotoPickerView.swift in Sources */,
+				49E70E152E5E1BD6003D5A2B /* ExportOptionsView.swift in Sources */,
 				01000001294A5C7A00000001 /* FilterCraft_iOSApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
