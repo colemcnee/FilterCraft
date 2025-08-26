@@ -94,8 +94,8 @@ struct ContentView: View {
     
     private var imageDisplaySection: some View {
         Group {
-            if let previewImage = editSession.previewImage {
-                AsyncImageView(ciImage: previewImage)
+            if editSession.previewImage != nil {
+                AsyncImageView(editSession: editSession)
                     .frame(maxHeight: 400)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .overlay(
@@ -456,7 +456,7 @@ struct AdjustmentSlider: View {
 }
 
 struct AsyncImageView: View {
-    let ciImage: CIImage
+    @ObservedObject var editSession: EditSession
     @State private var uiImage: UIImage?
     
     var body: some View {
@@ -474,14 +474,20 @@ struct AsyncImageView: View {
             }
         }
         .onAppear {
-            convertCIImageToUIImage()
+            if let previewImage = editSession.previewImage {
+                convertCIImageToUIImage(previewImage)
+            }
         }
-        .onChange(of: ciImage) { _ in
-            convertCIImageToUIImage()
+        .onReceive(editSession.$previewImage) { newPreviewImage in
+            guard let ciImage = newPreviewImage else { 
+                uiImage = nil
+                return 
+            }
+            convertCIImageToUIImage(ciImage)
         }
     }
     
-    private func convertCIImageToUIImage() {
+    private func convertCIImageToUIImage(_ ciImage: CIImage) {
         Task {
             let context = CIContext(options: [.useSoftwareRenderer: false])
             if let cgImage = context.createCGImage(ciImage, from: ciImage.extent) {
