@@ -6,23 +6,53 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    ImageDisplayView(editSession: editSession)
-                    PhotoPickerView(editSession: editSession)
-                    
-                    if editSession.originalImage != nil {
+            if editSession.originalImage != nil {
+                // Editing mode - compact layout with scroll
+                ScrollView {
+                    VStack(spacing: 24) {
+                        ImageDisplayView(editSession: editSession)
                         FilterSelectionView(editSession: editSession)
                         AdjustmentControlsView(editSession: editSession)
                         ExportOptionsView(editSession: editSession)
                     }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
+                .navigationTitle("FilterCraft")
+                .navigationBarTitleDisplayMode(.inline)
+            } else {
+                // Welcome mode - spacious layout
+                VStack(spacing: 0) {
+                    Spacer()
+                    
+                    VStack(spacing: 32) {
+                        // App icon or logo area
+                        Image(systemName: "photo.artframe")
+                            .font(.system(size: 80))
+                            .foregroundColor(.blue)
+                        
+                        VStack(spacing: 16) {
+                            Text("FilterCraft")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                            
+                            Text("Transform your photos with professional filters and adjustments")
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 40)
+                        }
+                        
+                        PhotoPickerView(editSession: editSession)
+                            .padding(.horizontal, 40)
+                    }
+                    
+                    Spacer()
+                    Spacer() // Extra spacer to push content up slightly
+                }
+                .navigationTitle("")
+                .navigationBarHidden(true)
             }
-            .navigationTitle("FilterCraft")
-            .navigationBarTitleDisplayMode(.inline)
         }
-        .padding(.vertical, 20)
     }
 }
 

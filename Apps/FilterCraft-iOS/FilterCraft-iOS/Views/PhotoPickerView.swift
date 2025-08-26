@@ -14,16 +14,20 @@ struct PhotoPickerView: View {
                     matching: .images,
                     photoLibrary: .shared()
                 ) {
-                    HStack {
-                        Image(systemName: "photo.on.rectangle.angled")
+                    VStack(spacing: 8) {
+                        Image(systemName: "photo.badge.plus")
+                            .font(.title2)
                         Text("Select Photo")
+                            .font(.headline)
                     }
-                    .font(.headline)
                     .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(.vertical, 20)
+                    .padding(.horizontal, 40)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(.blue)
+                            .shadow(color: .blue.opacity(0.3), radius: 8, y: 4)
+                    )
                 }
             } else {
                 // Show current image info and option to select new photo
