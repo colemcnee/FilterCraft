@@ -1,6 +1,7 @@
 import SwiftUI
 import FilterCraftCore
 
+@MainActor
 struct ToolbarView: ToolbarContent {
     let editSession: EditSession
     @Binding var showingBeforeAfter: Bool
