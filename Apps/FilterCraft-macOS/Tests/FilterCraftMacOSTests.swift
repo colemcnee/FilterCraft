@@ -1,5 +1,6 @@
 import XCTest
 import SwiftUI
+import FilterCraftCore
 @testable import FilterCraft_macOS
 
 final class FilterCraftMacOSTests: XCTestCase {
@@ -9,16 +10,19 @@ final class FilterCraftMacOSTests: XCTestCase {
         XCTAssertNotNil(app.body)
     }
     
+    @MainActor
     func testContentViewInitialization() throws {
-        let contentView = ContentView()
+        let editSession = EditSession()
+        let contentView = ContentView(editSession: editSession)
         XCTAssertNotNil(contentView.body)
     }
     
+    @MainActor
     func testToolbarViewInitialization() throws {
         let editSession = EditSession()
         let showingBeforeAfter = Binding.constant(false)
         let showingInspector = Binding.constant(true)
-        let zoomScale = Binding.constant(1.0)
+        let zoomScale = Binding.constant(CGFloat(1.0))
         
         let toolbarView = ToolbarView(
             editSession: editSession,
@@ -33,6 +37,7 @@ final class FilterCraftMacOSTests: XCTestCase {
         XCTAssertNotNil(toolbarView.body)
     }
     
+    @MainActor
     func testInspectorViewWithEmptySession() throws {
         let editSession = EditSession()
         let inspectorView = InspectorView(editSession: editSession)
@@ -61,15 +66,18 @@ final class FilterCraftMacOSTests: XCTestCase {
         XCTAssertNotNil(filterButton.body)
     }
     
+    @MainActor
     func testAdjustmentControlsViewInitialization() throws {
-        let adjustments = Binding.constant(ImageAdjustments())
-        let adjustmentControlsView = AdjustmentControlsView(adjustments: adjustments)
+        let editSession = EditSession()
+        let adjustmentControlsView = AdjustmentControlsView(editSession: editSession)
         
         XCTAssertNotNil(adjustmentControlsView.body)
     }
     
+    @MainActor
     func testFilterCraftCommandsInitialization() throws {
-        let commands = FilterCraftCommands()
+        let editSession = EditSession()
+        let commands = FilterCraftCommands(editSession: editSession)
         XCTAssertNotNil(commands.body)
     }
     
