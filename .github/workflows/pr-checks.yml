@@ -25,11 +25,11 @@ jobs:
         fetch-depth: 0
     
     - name: Validate PR basics
+      env:
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        PR_BODY: ${{ github.event.pull_request.body }}
       run: |
         echo "🔍 Validating PR basics..."
-        
-        PR_TITLE="${{ github.event.pull_request.title }}"
-        PR_BODY="${{ github.event.pull_request.body }}"
         
         # Simple title check - just ensure it's not empty and has some structure
         if [[ -z "$PR_TITLE" || ${#PR_TITLE} -lt 10 ]]; then
