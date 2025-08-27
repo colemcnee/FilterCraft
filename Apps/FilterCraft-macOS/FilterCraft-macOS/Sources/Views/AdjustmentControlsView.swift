@@ -1,10 +1,10 @@
 import SwiftUI
 import FilterCraftCore
 
-struct AdjustmentControlsView: View {
+internal struct AdjustmentControlsView: View {
     @ObservedObject var editSession: EditSession
     
-    var body: some View {
+    internal var body: some View {
         VStack(spacing: 16) {
             // Show base adjustments from filter (if any)
             if editSession.baseAdjustments.hasAdjustments {
@@ -240,7 +240,7 @@ struct AdjustmentControlsView: View {
     }
 }
 
-struct AdjustmentSlider: View {
+internal struct AdjustmentSlider: View {
     let title: String
     @Binding var value: Float
     let range: ClosedRange<Float>
@@ -249,7 +249,7 @@ struct AdjustmentSlider: View {
     
     @State private var isEditing = false
     
-    var body: some View {
+    internal var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Image(systemName: icon)
@@ -317,10 +317,10 @@ struct AdjustmentSlider: View {
     }
 }
 
-struct BaseAdjustmentDisplay: View {
+internal struct BaseAdjustmentDisplay: View {
     let adjustments: ImageAdjustments
     
-    var body: some View {
+    internal var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             if adjustments.brightness != 0 {
                 BaseAdjustmentRow(label: "Brightness", value: adjustments.brightness, icon: "sun.max")
@@ -351,12 +351,12 @@ struct BaseAdjustmentDisplay: View {
     }
 }
 
-struct BaseAdjustmentRow: View {
+internal struct BaseAdjustmentRow: View {
     let label: String
     let value: Float
     let icon: String
     
-    var body: some View {
+    internal var body: some View {
         HStack {
             Image(systemName: icon)
                 .font(.caption2)

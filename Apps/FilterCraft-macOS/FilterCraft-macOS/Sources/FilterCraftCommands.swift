@@ -1,10 +1,10 @@
 import SwiftUI
 import FilterCraftCore
 
-struct FilterCraftCommands: Commands {
+internal struct FilterCraftCommands: Commands {
     @ObservedObject var editSession: EditSession
     
-    var body: some Commands {
+    internal var body: some Commands {
         // File Menu
         CommandGroup(replacing: .newItem) {
             Button("Open Image...") {
@@ -147,8 +147,8 @@ struct FilterCraftCommands: Commands {
     }
 }
 
-struct FilterMenuCommands: View {
-    var body: some View {
+internal struct FilterMenuCommands: View {
+    internal var body: some View {
         Group {
             Button("No Filter") {
                 NotificationCenter.default.post(name: .applyFilter, object: FilterType.none)
@@ -201,10 +201,10 @@ struct FilterMenuCommands: View {
 }
 
 /// Edit History menu commands for advanced history management
-struct EditHistoryMenuCommands: View {
+internal struct EditHistoryMenuCommands: View {
     @ObservedObject var editSession: EditSession
     
-    var body: some View {
+    internal var body: some View {
         Group {
             // Navigation
             Button("Go to Beginning") {
