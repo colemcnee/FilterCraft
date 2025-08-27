@@ -77,13 +77,22 @@ struct AdjustmentControlsView: View {
                         AdjustmentSliderRow(
                             adjustmentType: adjustmentType,
                             value: Binding(
-                                get: { editSession.userAdjustments.value(for: adjustmentType) },
+                                get: { 
+                                    editSession.isPreviewingAdjustments ? editSession.previewAdjustments.value(for: adjustmentType) : editSession.userAdjustments.value(for: adjustmentType)
+                                },
                                 set: { newValue in
-                                    var newAdjustments = editSession.userAdjustments
-                                    newAdjustments.setValue(newValue, for: adjustmentType)
-                                    editSession.updateUserAdjustments(newAdjustments)
+                                    if editSession.isPreviewingAdjustments {
+                                        var newPreviewAdjustments = editSession.previewAdjustments
+                                        newPreviewAdjustments.setValue(newValue, for: adjustmentType)
+                                        editSession.updatePreviewAdjustments(newPreviewAdjustments)
+                                    } else {
+                                        var newAdjustments = editSession.userAdjustments
+                                        newAdjustments.setValue(newValue, for: adjustmentType)
+                                        editSession.updateUserAdjustments(newAdjustments)
+                                    }
                                 }
-                            )
+                            ),
+                            editSession: editSession
                         )
                     }
                 }
@@ -123,6 +132,7 @@ struct BaseAdjustmentRow: View {
 struct AdjustmentSliderRow: View {
     let adjustmentType: AdjustmentType
     @Binding var value: Float
+    let editSession: EditSession
     
     var body: some View {
         VStack(spacing: 4) {
@@ -154,7 +164,16 @@ struct AdjustmentSliderRow: View {
             
             Slider(
                 value: $value,
-                in: adjustmentType.minValue...adjustmentType.maxValue
+                in: adjustmentType.minValue...adjustmentType.maxValue,
+                onEditingChanged: { editing in
+                    if editing {
+                        // Start preview mode when slider interaction begins
+                        editSession.startPreviewingAdjustments()
+                    } else {
+                        // Commit changes when slider interaction ends
+                        editSession.commitPreviewAdjustments()
+                    }
+                }
             ) {
                 Text(adjustmentType.displayName)
             }

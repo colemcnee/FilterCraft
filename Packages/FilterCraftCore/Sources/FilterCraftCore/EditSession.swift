@@ -78,9 +78,25 @@ public class EditSession: ObservableObject {
         }
     }
     
-    /// Combined effective adjustments (base + user adjustments)
+    /// Temporary preview adjustments for real-time feedback during slider interaction
+    @Published public private(set) var previewAdjustments = ImageAdjustments()
+    
+    /// Whether we're currently previewing adjustments (slider being dragged)
+    @Published public private(set) var isPreviewingAdjustments = false
+    
+    /// Original user adjustments before preview started (for command creation)
+    private var previewStartAdjustments = ImageAdjustments()
+    
+    /// Combined effective adjustments (base + user adjustments + preview if active)
     public var effectiveAdjustments: ImageAdjustments {
-        return baseAdjustments.combined(with: userAdjustments)
+        if isPreviewingAdjustments {
+            // When previewing, combine base adjustments with preview adjustments
+            // (preview adjustments represent the user's temporary changes)
+            return baseAdjustments.combined(with: previewAdjustments)
+        } else {
+            // Normal operation: combine base + user adjustments
+            return baseAdjustments.combined(with: userAdjustments)
+        }
     }
     
     /// Legacy property for backward compatibility - returns effective adjustments
@@ -117,8 +133,14 @@ public class EditSession: ObservableObject {
     /// Original unedited image
     @Published public private(set) var originalImage: CIImage?
     
-    /// History of edit operations
+    /// History of edit operations (legacy - kept for compatibility)
     @Published public private(set) var editHistory: [EditOperation] = []
+    
+    /// New command-based history system for undo/redo
+    @Published public private(set) var commandHistory: EditHistory = EditHistory()
+    
+    /// Whether command-based history is enabled (can be disabled for legacy compatibility)
+    public let commandHistoryEnabled: Bool
     
     /// Session statistics
     @Published public private(set) var sessionStats = SessionStatistics()
@@ -141,9 +163,19 @@ public class EditSession: ObservableObject {
     
     // MARK: - Initialization
     
-    public init(imageProcessor: ImageProcessing = ImageProcessor()) {
+    public init(
+        imageProcessor: ImageProcessing = ImageProcessor(),
+        enableCommandHistory: Bool = true
+    ) {
         self.imageProcessor = imageProcessor
         self.sessionStats = SessionStatistics()
+        self.commandHistoryEnabled = enableCommandHistory
+        
+        if enableCommandHistory {
+            self.commandHistory = EditHistory()
+        } else {
+            self.commandHistory = EditHistory(maxHistorySize: 0, maxMemoryUsage: 0)
+        }
     }
     
     // MARK: - Public Methods
@@ -174,12 +206,80 @@ public class EditSession: ObservableObject {
     
     /// Update adjustments with specific values (legacy method)
     public func updateAdjustments(_ newAdjustments: ImageAdjustments) {
-        adjustments = newAdjustments
+        if commandHistoryEnabled {
+            let command = AdjustmentCommand(
+                previousUserAdjustments: userAdjustments,
+                newUserAdjustments: newAdjustments
+            )
+            Task {
+                await executeCommand(command)
+            }
+        } else {
+            adjustments = newAdjustments
+        }
     }
     
     /// Update user adjustments specifically (recommended method)
     public func updateUserAdjustments(_ newAdjustments: ImageAdjustments) {
-        userAdjustments = newAdjustments
+        if commandHistoryEnabled {
+            let command = AdjustmentCommand(
+                previousUserAdjustments: userAdjustments,
+                newUserAdjustments: newAdjustments
+            )
+            Task {
+                await executeCommand(command)
+            }
+        } else {
+            userAdjustments = newAdjustments
+        }
+    }
+    
+    /// Start previewing adjustments (called when user begins slider interaction)
+    public func startPreviewingAdjustments() {
+        guard !isPreviewingAdjustments else { return }
+        
+        previewStartAdjustments = userAdjustments
+        previewAdjustments = userAdjustments  // Start with current user adjustments
+        isPreviewingAdjustments = true
+    }
+    
+    /// Update preview adjustments during slider interaction
+    public func updatePreviewAdjustments(_ adjustments: ImageAdjustments) {
+        guard isPreviewingAdjustments else { return }
+        
+        // Store the full adjustment values directly as they come from the sliders
+        previewAdjustments = adjustments
+        
+        // Trigger preview update without creating commands
+        Task {
+            await updatePreview(reason: "Preview adjustments changed")
+        }
+    }
+    
+    /// End previewing and commit the final adjustments as a single command
+    public func commitPreviewAdjustments() {
+        guard isPreviewingAdjustments else { return }
+        
+        // The preview adjustments represent the final user adjustments
+        let finalAdjustments = previewAdjustments
+        isPreviewingAdjustments = false
+        previewAdjustments = ImageAdjustments()
+        
+        // Create single command from start to final state
+        updateUserAdjustments(finalAdjustments)
+    }
+    
+    /// Cancel previewing and revert to original adjustments
+    public func cancelPreviewAdjustments() {
+        guard isPreviewingAdjustments else { return }
+        
+        isPreviewingAdjustments = false
+        previewAdjustments = ImageAdjustments()
+        
+        // Trigger preview update to show original state
+        Task {
+            await updatePreview(reason: "Preview cancelled")
+        }
     }
     
     /// Apply a filter with specified intensity
@@ -187,31 +287,68 @@ public class EditSession: ObservableObject {
         // Set pending filter immediately for UI feedback
         pendingFilter = filterType
         
-        // Update base adjustments to reflect what the filter does
-        baseAdjustments = filterType.getScaledAdjustments(intensity: intensity)
-        
         let newFilter = AppliedFilter(filterType: filterType, intensity: intensity)
-        appliedFilter = newFilter
+        
+        if commandHistoryEnabled {
+            let command: FilterCommand
+            if let currentFilter = appliedFilter {
+                command = FilterCommand(
+                    changingFromFilter: currentFilter,
+                    toFilter: newFilter,
+                    previousBaseAdjustments: baseAdjustments
+                )
+            } else {
+                command = FilterCommand(
+                    applyingFilter: newFilter,
+                    previousBaseAdjustments: baseAdjustments
+                )
+            }
+            
+            Task {
+                await executeCommand(command)
+            }
+        } else {
+            // Update base adjustments to reflect what the filter does
+            baseAdjustments = filterType.getScaledAdjustments(intensity: intensity)
+            appliedFilter = newFilter
+        }
     }
     
     /// Update the intensity of the current filter
     public func updateFilterIntensity(_ intensity: Float) {
         guard let currentFilter = appliedFilter else { return }
         
-        // Update base adjustments to reflect new intensity
-        baseAdjustments = currentFilter.filterType.getScaledAdjustments(intensity: intensity)
-        
-        appliedFilter = currentFilter.withIntensity(intensity)
+        if commandHistoryEnabled {
+            let command = FilterCommand(
+                changingIntensityOf: currentFilter,
+                from: currentFilter.intensity,
+                to: intensity,
+                previousBaseAdjustments: baseAdjustments
+            )
+            
+            Task {
+                await executeCommand(command)
+            }
+        } else {
+            // Update base adjustments to reflect new intensity
+            baseAdjustments = currentFilter.filterType.getScaledAdjustments(intensity: intensity)
+            appliedFilter = currentFilter.withIntensity(intensity)
+        }
     }
     
     /// Reset all edits to original image
     public func resetToOriginal() async {
         processingState = .processing(progress: 0.3, operation: "Resetting edits")
         
-        resetEditsInternal()
-        await updatePreview(reason: "Reset to original")
+        if commandHistoryEnabled {
+            let command = ResetCommand(completeResetFrom: self)
+            await executeCommand(command)
+        } else {
+            resetEditsInternal()
+            await updatePreview(reason: "Reset to original")
+            recordOperation(.reset, description: "Reset all edits")
+        }
         
-        recordOperation(.reset, description: "Reset all edits")
         processingState = .completed
     }
     
@@ -277,6 +414,122 @@ public class EditSession: ObservableObject {
             return "Error: \(error.localizedDescription)"
         default:
             return nil
+        }
+    }
+    
+    // MARK: - Command System Methods
+    
+    /// Execute a command and add it to history
+    public func executeCommand(_ command: EditCommand) async {
+        await command.execute(on: self)
+        if commandHistoryEnabled {
+            commandHistory.addCommand(command)
+        }
+    }
+    
+    /// Undo the last operation
+    public func undo() async {
+        guard commandHistoryEnabled else { return }
+        await commandHistory.undo(on: self)
+    }
+    
+    /// Redo the last undone operation
+    public func redo() async {
+        guard commandHistoryEnabled else { return }
+        await commandHistory.redo(on: self)
+    }
+    
+    /// Clear all command history
+    public func clearCommandHistory() {
+        guard commandHistoryEnabled else { return }
+        commandHistory.clearHistory()
+    }
+    
+    // MARK: - Internal Command System Methods
+    // These methods are used by commands to directly modify state without triggering new commands
+    
+    internal func setUserAdjustmentsDirectly(_ adjustments: ImageAdjustments) async {
+        // Temporarily disable the didSet observer by using the backing property
+        let oldUserAdjustments = userAdjustments
+        
+        // Set the new value without triggering the didSet
+        userAdjustments = adjustments
+        
+        // Manually trigger the preview update if the value actually changed
+        if adjustments != oldUserAdjustments {
+            await updatePreview(reason: "User adjustments changed via command")
+            recordOperation(.adjustmentChange, description: "Updated manual adjustments")
+        }
+    }
+    
+    internal func setBaseAdjustmentsDirectly(_ adjustments: ImageAdjustments) async {
+        let oldBaseAdjustments = baseAdjustments
+        baseAdjustments = adjustments
+        
+        if adjustments != oldBaseAdjustments {
+            await updatePreview(reason: "Base adjustments changed via command")
+        }
+    }
+    
+    internal func setAppliedFilterDirectly(_ filter: AppliedFilter?) async {
+        let oldFilter = appliedFilter
+        appliedFilter = filter
+        
+        if filter != oldFilter {
+            await updatePreview(reason: "Filter changed via command")
+            recordOperation(.filterApplication, 
+                          description: filter?.description ?? "Removed filter")
+        }
+    }
+    
+    /// Reset adjustments of a specific type
+    public func resetAdjustments() async {
+        if commandHistoryEnabled {
+            let command = ResetCommand(adjustmentResetFrom: self)
+            await executeCommand(command)
+        } else {
+            userAdjustments = ImageAdjustments()
+            baseAdjustments = ImageAdjustments()
+            await updatePreview(reason: "Reset adjustments")
+            recordOperation(.reset, description: "Reset adjustments")
+        }
+    }
+    
+    /// Reset only the current filter
+    public func resetFilter() async {
+        guard appliedFilter != nil else { return }
+        
+        if commandHistoryEnabled {
+            let command = ResetCommand(filterResetFrom: self)
+            await executeCommand(command)
+        } else {
+            appliedFilter = nil
+            baseAdjustments = ImageAdjustments()
+            await updatePreview(reason: "Reset filter")
+            recordOperation(.reset, description: "Reset filter")
+        }
+    }
+    
+    /// Reset only user adjustments (keep base adjustments from filters)
+    public func resetUserAdjustments() async {
+        if commandHistoryEnabled {
+            let command = ResetCommand(userAdjustmentResetFrom: self)
+            await executeCommand(command)
+        } else {
+            userAdjustments = ImageAdjustments()
+            await updatePreview(reason: "Reset user adjustments")
+            recordOperation(.reset, description: "Reset manual adjustments")
+        }
+    }
+    
+    /// Smart reset that analyzes current state and resets intelligently
+    public func smartReset() async {
+        if commandHistoryEnabled {
+            let command = SmartResetCommand(smartResetFrom: self)
+            await executeCommand(command)
+        } else {
+            // Fallback to complete reset for legacy mode
+            await resetToOriginal()
         }
     }
     

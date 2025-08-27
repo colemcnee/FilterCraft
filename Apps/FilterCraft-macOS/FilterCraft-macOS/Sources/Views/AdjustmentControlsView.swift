@@ -41,58 +41,186 @@ struct AdjustmentControlsView: View {
                 VStack(spacing: 12) {
                     AdjustmentSlider(
                         title: "Brightness",
-                        value: $editSession.userAdjustments.brightness,
+                        value: Binding(
+                            get: { 
+                                editSession.isPreviewingAdjustments ? editSession.previewAdjustments.brightness : editSession.userAdjustments.brightness
+                            },
+                            set: { newValue in
+                                if editSession.isPreviewingAdjustments {
+                                    var newPreviewAdjustments = editSession.previewAdjustments
+                                    newPreviewAdjustments.brightness = newValue
+                                    editSession.updatePreviewAdjustments(newPreviewAdjustments)
+                                } else {
+                                    var newAdjustments = editSession.userAdjustments
+                                    newAdjustments.brightness = newValue
+                                    editSession.updateUserAdjustments(newAdjustments)
+                                }
+                            }
+                        ),
                         range: -1...1,
-                        icon: "sun.max"
+                        icon: "sun.max",
+                        editSession: editSession
                     )
                     
                     AdjustmentSlider(
                         title: "Contrast",
-                        value: $editSession.userAdjustments.contrast,
+                        value: Binding(
+                            get: { 
+                                editSession.isPreviewingAdjustments ? editSession.previewAdjustments.contrast : editSession.userAdjustments.contrast
+                            },
+                            set: { newValue in
+                                if editSession.isPreviewingAdjustments {
+                                    var newPreviewAdjustments = editSession.previewAdjustments
+                                    newPreviewAdjustments.contrast = newValue
+                                    editSession.updatePreviewAdjustments(newPreviewAdjustments)
+                                } else {
+                                    var newAdjustments = editSession.userAdjustments
+                                    newAdjustments.contrast = newValue
+                                    editSession.updateUserAdjustments(newAdjustments)
+                                }
+                            }
+                        ),
                         range: -1...1,
-                        icon: "circle.lefthalf.filled"
+                        icon: "circle.lefthalf.filled",
+                        editSession: editSession
                     )
                     
                     AdjustmentSlider(
                         title: "Saturation",
-                        value: $editSession.userAdjustments.saturation,
+                        value: Binding(
+                            get: { 
+                                editSession.isPreviewingAdjustments ? editSession.previewAdjustments.saturation : editSession.userAdjustments.saturation
+                            },
+                            set: { newValue in
+                                if editSession.isPreviewingAdjustments {
+                                    var newPreviewAdjustments = editSession.previewAdjustments
+                                    newPreviewAdjustments.saturation = newValue
+                                    editSession.updatePreviewAdjustments(newPreviewAdjustments)
+                                } else {
+                                    var newAdjustments = editSession.userAdjustments
+                                    newAdjustments.saturation = newValue
+                                    editSession.updateUserAdjustments(newAdjustments)
+                                }
+                            }
+                        ),
                         range: -1...1,
-                        icon: "paintbrush"
+                        icon: "paintbrush",
+                        editSession: editSession
                     )
                     
                     AdjustmentSlider(
                         title: "Exposure",
-                        value: $editSession.userAdjustments.exposure,
+                        value: Binding(
+                            get: { 
+                                editSession.isPreviewingAdjustments ? editSession.previewAdjustments.exposure : editSession.userAdjustments.exposure
+                            },
+                            set: { newValue in
+                                if editSession.isPreviewingAdjustments {
+                                    var newPreviewAdjustments = editSession.previewAdjustments
+                                    newPreviewAdjustments.exposure = newValue
+                                    editSession.updatePreviewAdjustments(newPreviewAdjustments)
+                                } else {
+                                    var newAdjustments = editSession.userAdjustments
+                                    newAdjustments.exposure = newValue
+                                    editSession.updateUserAdjustments(newAdjustments)
+                                }
+                            }
+                        ),
                         range: -2...2,
-                        icon: "camera.aperture"
+                        icon: "camera.aperture",
+                        editSession: editSession
                     )
                     
                     AdjustmentSlider(
                         title: "Highlights",
-                        value: $editSession.userAdjustments.highlights,
+                        value: Binding(
+                            get: { 
+                                editSession.isPreviewingAdjustments ? editSession.previewAdjustments.highlights : editSession.userAdjustments.highlights
+                            },
+                            set: { newValue in
+                                if editSession.isPreviewingAdjustments {
+                                    var newPreviewAdjustments = editSession.previewAdjustments
+                                    newPreviewAdjustments.highlights = newValue
+                                    editSession.updatePreviewAdjustments(newPreviewAdjustments)
+                                } else {
+                                    var newAdjustments = editSession.userAdjustments
+                                    newAdjustments.highlights = newValue
+                                    editSession.updateUserAdjustments(newAdjustments)
+                                }
+                            }
+                        ),
                         range: -1...1,
-                        icon: "sun.and.horizon"
+                        icon: "sun.and.horizon",
+                        editSession: editSession
                     )
                     
                     AdjustmentSlider(
                         title: "Shadows",
-                        value: $editSession.userAdjustments.shadows,
+                        value: Binding(
+                            get: { 
+                                editSession.isPreviewingAdjustments ? editSession.previewAdjustments.shadows : editSession.userAdjustments.shadows
+                            },
+                            set: { newValue in
+                                if editSession.isPreviewingAdjustments {
+                                    var newPreviewAdjustments = editSession.previewAdjustments
+                                    newPreviewAdjustments.shadows = newValue
+                                    editSession.updatePreviewAdjustments(newPreviewAdjustments)
+                                } else {
+                                    var newAdjustments = editSession.userAdjustments
+                                    newAdjustments.shadows = newValue
+                                    editSession.updateUserAdjustments(newAdjustments)
+                                }
+                            }
+                        ),
                         range: -1...1,
-                        icon: "moon"
+                        icon: "moon",
+                        editSession: editSession
                     )
                     
                     AdjustmentSlider(
                         title: "Warmth",
-                        value: $editSession.userAdjustments.warmth,
+                        value: Binding(
+                            get: { 
+                                editSession.isPreviewingAdjustments ? editSession.previewAdjustments.warmth : editSession.userAdjustments.warmth
+                            },
+                            set: { newValue in
+                                if editSession.isPreviewingAdjustments {
+                                    var newPreviewAdjustments = editSession.previewAdjustments
+                                    newPreviewAdjustments.warmth = newValue
+                                    editSession.updatePreviewAdjustments(newPreviewAdjustments)
+                                } else {
+                                    var newAdjustments = editSession.userAdjustments
+                                    newAdjustments.warmth = newValue
+                                    editSession.updateUserAdjustments(newAdjustments)
+                                }
+                            }
+                        ),
                         range: -1...1,
-                        icon: "thermometer"
+                        icon: "thermometer",
+                        editSession: editSession
                     )
                     
                     AdjustmentSlider(
                         title: "Tint",
-                        value: $editSession.userAdjustments.tint,
+                        value: Binding(
+                            get: { 
+                                editSession.isPreviewingAdjustments ? editSession.previewAdjustments.tint : editSession.userAdjustments.tint
+                            },
+                            set: { newValue in
+                                if editSession.isPreviewingAdjustments {
+                                    var newPreviewAdjustments = editSession.previewAdjustments
+                                    newPreviewAdjustments.tint = newValue
+                                    editSession.updatePreviewAdjustments(newPreviewAdjustments)
+                                } else {
+                                    var newAdjustments = editSession.userAdjustments
+                                    newAdjustments.tint = newValue
+                                    editSession.updateUserAdjustments(newAdjustments)
+                                }
+                            }
+                        ),
                         range: -1...1,
-                        icon: "drop.triangle"
+                        icon: "drop.triangle",
+                        editSession: editSession
                     )
                 }
             }
@@ -100,7 +228,7 @@ struct AdjustmentControlsView: View {
             if editSession.userAdjustments.hasAdjustments {
                 Button("Reset Manual Adjustments") {
                     withAnimation(.easeInOut(duration: 0.3)) {
-                        editSession.userAdjustments = ImageAdjustments()
+                        editSession.updateUserAdjustments(ImageAdjustments())
                     }
                 }
                 .buttonStyle(.bordered)
@@ -117,6 +245,7 @@ struct AdjustmentSlider: View {
     @Binding var value: Float
     let range: ClosedRange<Float>
     let icon: String
+    let editSession: EditSession
     
     @State private var isEditing = false
     
@@ -147,6 +276,13 @@ struct AdjustmentSlider: View {
                     in: range,
                     onEditingChanged: { editing in
                         isEditing = editing
+                        if editing {
+                            // Start preview mode when slider interaction begins
+                            editSession.startPreviewingAdjustments()
+                        } else {
+                            // Commit changes when slider interaction ends
+                            editSession.commitPreviewAdjustments()
+                        }
                     }
                 )
                 .accentColor(isNearZero ? .secondary : .blue)

@@ -166,7 +166,7 @@ final class EditSessionTests: XCTestCase {
         editSession.applyFilter(.none)
         
         XCTAssertNotNil(editSession.appliedFilter) // AppliedFilter exists
-        XCTAssertEqual(editSession.appliedFilter?.filterType, .none) // But is none type
+        XCTAssertEqual(editSession.appliedFilter?.filterType, FilterType.none) // But is none type
         XCTAssertFalse(editSession.appliedFilter?.isEffective ?? true) // And not effective
     }
     

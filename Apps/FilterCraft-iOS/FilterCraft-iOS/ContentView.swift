@@ -8,14 +8,45 @@ struct ContentView: View {
         NavigationView {
             if editSession.originalImage != nil {
                 // Editing mode - compact layout with scroll
-                ScrollView {
-                    VStack(spacing: 24) {
-                        ImageDisplayView(editSession: editSession)
-                        FilterSelectionView(editSession: editSession)
-                        AdjustmentControlsView(editSession: editSession)
-                        ExportOptionsView(editSession: editSession)
+                VStack(spacing: 0) {
+                    // Undo/Redo controls at the top
+                    HStack {
+                        Button {
+                            Task { await editSession.undo() }
+                        } label: {
+                            Image(systemName: "arrow.uturn.backward")
+                                .foregroundColor(editSession.commandHistory.canUndo ? .blue : .gray)
+                        }
+                        .disabled(!editSession.commandHistory.canUndo)
+                        
+                        Button {
+                            Task { await editSession.redo() }
+                        } label: {
+                            Image(systemName: "arrow.uturn.forward")
+                                .foregroundColor(editSession.commandHistory.canRedo ? .blue : .gray)
+                        }
+                        .disabled(!editSession.commandHistory.canRedo)
+                        
+                        Spacer()
+                        
+                        if editSession.commandHistory.canUndo || editSession.commandHistory.canRedo {
+                            Text("\(editSession.commandHistory.currentPosition)/\(editSession.commandHistory.totalCommands)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                     }
                     .padding(.horizontal)
+                    .padding(.vertical, 8)
+                    
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            ImageDisplayView(editSession: editSession)
+                            FilterSelectionView(editSession: editSession)
+                            AdjustmentControlsView(editSession: editSession)
+                            ExportOptionsView(editSession: editSession)
+                        }
+                        .padding(.horizontal)
+                    }
                 }
                 .navigationTitle("FilterCraft")
                 .navigationBarTitleDisplayMode(.inline)
