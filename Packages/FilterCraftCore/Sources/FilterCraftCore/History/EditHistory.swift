@@ -248,8 +248,9 @@ public class EditHistory: ObservableObject {
     
     private func startBackgroundCleanup() {
         backgroundCleanupTimer = Timer.scheduledTimer(withTimeInterval: cleanupInterval, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
             Task { @MainActor in
-                self?.performBackgroundCleanup()
+                await self.performBackgroundCleanup()
             }
         }
     }
@@ -259,7 +260,7 @@ public class EditHistory: ObservableObject {
         backgroundCleanupTimer = nil
     }
     
-    private func performBackgroundCleanup() {
+    private func performBackgroundCleanup() async {
         // Only cleanup if we haven't had recent operations
         let recentThreshold = Date().addingTimeInterval(-60) // 1 minute
         if lastOperationTime < recentThreshold {
