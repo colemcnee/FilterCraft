@@ -1,5 +1,5 @@
-import SwiftUI
 import CoreImage
+import SwiftUI
 
 struct ImageCanvasView: View {
     let image: CIImage

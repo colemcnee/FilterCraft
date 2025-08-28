@@ -1,5 +1,5 @@
-import SwiftUI
 import FilterCraftCore
+import SwiftUI
 
 struct FilterButton: View {
     let filterType: FilterType

@@ -1,8 +1,8 @@
-import XCTest
-import SwiftUI
 import CoreImage
-import FilterCraftCore
 @testable import FilterCraft_macOS
+import FilterCraftCore
+import SwiftUI
+import XCTest
 
 final class ViewTests: XCTestCase {
     

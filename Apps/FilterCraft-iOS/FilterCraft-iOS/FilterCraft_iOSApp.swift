@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct FilterCraft_iOSApp: App {
+struct FilterCraftIOSApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

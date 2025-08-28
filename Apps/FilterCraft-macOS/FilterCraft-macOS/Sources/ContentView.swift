@@ -1,7 +1,7 @@
-import SwiftUI
-import FilterCraftCore
-import Combine
 import AppKit
+import Combine
+import FilterCraftCore
+import SwiftUI
 import UniformTypeIdentifiers
 
 @MainActor
@@ -16,7 +16,7 @@ struct ContentView: View {
     @State private var showingAdjustments = true
     
     var body: some View {
-        GeometryReader { geometry in
+        GeometryReader { _ in
             HSplitView {
                 // Left Panel - Filters & Adjustments
                 leftPanel
@@ -161,7 +161,6 @@ struct ContentView: View {
             loadImage(image)
         }
     }
-    
     
     private func exportImage(to url: URL) async {
         let format: ImageExportFormat
