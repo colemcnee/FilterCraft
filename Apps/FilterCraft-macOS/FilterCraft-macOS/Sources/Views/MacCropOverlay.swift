@@ -28,7 +28,13 @@ struct MacCropOverlay: View {
             }
         }
         .clipped()
-        .cursor(cursorForDragType)
+        .onHover { hovering in
+            if hovering {
+                cursorForDragType.set()
+            } else {
+                NSCursor.arrow.set()
+            }
+        }
     }
     
     // MARK: - Crop Mask
@@ -142,13 +148,13 @@ struct MacCropOverlay: View {
         }
         
         let normalizedTranslation = CGSize(
-            width: value.translation.x / geometry.size.width,
-            height: value.translation.y / geometry.size.height
+            width: value.translation.width / geometry.size.width,
+            height: value.translation.height / geometry.size.height
         )
         
         var newCropRect = initialCropRect
-        newCropRect.origin.x += normalizedTranslation.x
-        newCropRect.origin.y += normalizedTranslation.y
+        newCropRect.origin.x += normalizedTranslation.width
+        newCropRect.origin.y += normalizedTranslation.height
         
         // Constrain to bounds
         newCropRect.origin.x = max(0, min(1 - newCropRect.width, newCropRect.origin.x))
@@ -166,8 +172,8 @@ struct MacCropOverlay: View {
         }
         
         let normalizedTranslation = CGSize(
-            width: value.translation.x / geometry.size.width,
-            height: value.translation.y / geometry.size.height
+            width: value.translation.width / geometry.size.width,
+            height: value.translation.height / geometry.size.height
         )
         
         var newCropRect = initialCropRect
@@ -213,8 +219,8 @@ struct MacCropOverlay: View {
         }
         
         let normalizedTranslation = CGSize(
-            width: value.translation.x / geometry.size.width,
-            height: value.translation.y / geometry.size.height
+            width: value.translation.width / geometry.size.width,
+            height: value.translation.height / geometry.size.height
         )
         
         var newCropRect = initialCropRect

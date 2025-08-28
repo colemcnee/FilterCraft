@@ -3,6 +3,7 @@ import SwiftUI
 
 internal struct FilterCraftCommands: Commands {
     @ObservedObject var editSession: EditSession
+    @Binding var isInCropMode: Bool
     
     internal var body: some Commands {
         // File Menu
@@ -82,6 +83,41 @@ internal struct FilterCraftCommands: Commands {
             }
             .keyboardShortcut("k", modifiers: [.command, .shift])
             .disabled(editSession.commandHistory.totalCommands == 0)
+            
+            Divider()
+            
+            // Crop/Rotate commands
+            if isInCropMode {
+                Button("Exit Crop Mode") {
+                    NotificationCenter.default.post(name: .exitCropMode, object: nil)
+                }
+                .keyboardShortcut(.escape)
+                
+                Button("Apply Crop") {
+                    NotificationCenter.default.post(name: .applyCropMode, object: nil)
+                }
+                .keyboardShortcut(.return)
+                
+                Button("Reset Crop") {
+                    NotificationCenter.default.post(name: .resetCropMode, object: nil)
+                }
+                .keyboardShortcut("r")
+            } else {
+                Button("Crop & Rotate") {
+                    NotificationCenter.default.post(name: .enterCropMode, object: nil)
+                }
+                .keyboardShortcut("t", modifiers: [.command, .shift])
+                .disabled(editSession.originalImage == nil)
+            }
+        }
+        
+        // Tools Menu
+        CommandMenu("Tools") {
+            Button("Crop Tool") {
+                NotificationCenter.default.post(name: .enterCropMode, object: nil)
+            }
+            .keyboardShortcut("c", modifiers: .command)
+            .disabled(editSession.originalImage == nil || isInCropMode)
         }
         
         // View Menu
@@ -387,4 +423,9 @@ extension Notification.Name {
     static let zoomToFit = Notification.Name("zoomToFit")
     static let applyFilter = Notification.Name("applyFilter")
     static let showHelp = Notification.Name("showHelp")
+    static let enterCropMode = Notification.Name("enterCropMode")
+    static let exitCropMode = Notification.Name("exitCropMode")
+    static let applyCropMode = Notification.Name("applyCropMode")
+    static let resetCropMode = Notification.Name("resetCropMode")
+    static let spaceBarPressed = Notification.Name("spaceBarPressed")
 }

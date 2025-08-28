@@ -3,6 +3,7 @@ import SwiftUI
 import FilterCraftCore
 
 /// macOS-specific crop and rotate interface with precision controls
+@available(macOS 12.0, *)
 struct MacCropRotateView: View {
     @ObservedObject var editSession: EditSession
     @State private var selectedTool: CropTool = .crop
@@ -47,9 +48,8 @@ struct MacCropRotateView: View {
                 }
             }
         }
-        .onKeyPress(.space) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .spaceBarPressed)) { _ in
             togglePrecisionMode()
-            return .handled
         }
     }
     
@@ -57,11 +57,15 @@ struct MacCropRotateView: View {
         ZStack {
             // Preview image
             if let previewImage = editSession.previewImage {
-                Image(decorative: previewImage, scale: 1.0)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
+                // Convert CIImage to NSImage for display
+                if let cgImage = previewImage.cgImage {
+                    let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+                    Image(nsImage: nsImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .clipped()
+                }
             } else {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
