@@ -91,3 +91,8 @@ iOSInjectionProject/
 
 ## macOS specific
 .DS_Store
+
+# Linting
+.swiftformat
+.swiftlint.yml.tmp
+.swiftlint_cache/
