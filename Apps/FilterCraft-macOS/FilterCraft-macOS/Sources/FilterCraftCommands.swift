@@ -1,8 +1,10 @@
 import SwiftUI
 import FilterCraftCore
 
-struct FilterCraftCommands: Commands {
-    var body: some Commands {
+internal struct FilterCraftCommands: Commands {
+    @ObservedObject var editSession: EditSession
+    
+    internal var body: some Commands {
         // File Menu
         CommandGroup(replacing: .newItem) {
             Button("Open Image...") {
@@ -23,19 +25,63 @@ struct FilterCraftCommands: Commands {
             .keyboardShortcut("e", modifiers: [.command, .shift])
         }
         
-        // Edit Menu
+        // Edit Menu - Replace the default undo/redo with our command-based system
+        CommandGroup(replacing: .undoRedo) {
+            Button(editSession.commandHistory.undoDescription.map { "Undo \($0)" } ?? "Undo") {
+                Task { await editSession.undo() }
+            }
+            .keyboardShortcut("z", modifiers: .command)
+            .disabled(!editSession.commandHistory.canUndo)
+            
+            Button(editSession.commandHistory.redoDescription.map { "Redo \($0)" } ?? "Redo") {
+                Task { await editSession.redo() }
+            }
+            .keyboardShortcut("z", modifiers: [.command, .shift])
+            .disabled(!editSession.commandHistory.canRedo)
+        }
+        
         CommandGroup(after: .undoRedo) {
             Divider()
             
             Button("Reset All Edits") {
-                NotificationCenter.default.post(name: .resetEdits, object: nil)
+                Task { await editSession.resetToOriginal() }
             }
             .keyboardShortcut("r", modifiers: [.command, .shift])
+            .disabled(editSession.originalImage == nil || !editSession.hasEdits)
+            
+            Button("Reset Adjustments") {
+                Task { await editSession.resetAdjustments() }
+            }
+            .keyboardShortcut("r", modifiers: [.command, .option])
+            .disabled(editSession.originalImage == nil || (!editSession.userAdjustments.hasAdjustments && !editSession.baseAdjustments.hasAdjustments))
+            
+            Button("Reset Filter") {
+                Task { await editSession.resetFilter() }
+            }
+            .keyboardShortcut("f", modifiers: [.command, .shift])
+            .disabled(editSession.appliedFilter == nil)
+            
+            Button("Smart Reset") {
+                Task { await editSession.smartReset() }
+            }
+            .keyboardShortcut("r", modifiers: [.command, .control])
+            .disabled(editSession.originalImage == nil || !editSession.hasEdits)
+            
+            Divider()
             
             Button("Copy Image") {
                 NotificationCenter.default.post(name: .copyImage, object: nil)
             }
             .keyboardShortcut("c", modifiers: .command)
+            .disabled(editSession.originalImage == nil)
+            
+            Divider()
+            
+            Button("Clear Edit History") {
+                editSession.clearCommandHistory()
+            }
+            .keyboardShortcut("k", modifiers: [.command, .shift])
+            .disabled(editSession.commandHistory.totalCommands == 0)
         }
         
         // View Menu
@@ -78,6 +124,11 @@ struct FilterCraftCommands: Commands {
             FilterMenuCommands()
         }
         
+        // History Menu - Advanced history management
+        CommandMenu("History") {
+            EditHistoryMenuCommands(editSession: editSession)
+        }
+        
         // Window Menu
         CommandGroup(replacing: .windowSize) {
             Button("Minimize") {
@@ -96,8 +147,8 @@ struct FilterCraftCommands: Commands {
     }
 }
 
-struct FilterMenuCommands: View {
-    var body: some View {
+internal struct FilterMenuCommands: View {
+    internal var body: some View {
         Group {
             Button("No Filter") {
                 NotificationCenter.default.post(name: .applyFilter, object: FilterType.none)
@@ -145,6 +196,177 @@ struct FilterMenuCommands: View {
                 NotificationCenter.default.post(name: .applyFilter, object: FilterType.soft)
             }
             .keyboardShortcut("8", modifiers: [.command, .option])
+        }
+    }
+}
+
+/// Edit History menu commands for advanced history management
+internal struct EditHistoryMenuCommands: View {
+    @ObservedObject var editSession: EditSession
+    
+    internal var body: some View {
+        Group {
+            // Navigation
+            Button("Go to Beginning") {
+                Task { await goToHistoryPosition(0) }
+            }
+            .keyboardShortcut("[", modifiers: [.command, .shift])
+            .disabled(editSession.commandHistory.currentPosition == 0)
+            
+            Button("Go to End") {
+                Task { await goToHistoryPosition(editSession.commandHistory.totalCommands) }
+            }
+            .keyboardShortcut("]", modifiers: [.command, .shift])
+            .disabled(editSession.commandHistory.currentPosition == editSession.commandHistory.totalCommands)
+            
+            Divider()
+            
+            // Batch operations
+            Button("Undo All") {
+                Task { await undoAll() }
+            }
+            .keyboardShortcut("z", modifiers: [.command, .option])
+            .disabled(!editSession.commandHistory.canUndo)
+            
+            Button("Redo All") {
+                Task { await redoAll() }
+            }
+            .keyboardShortcut("z", modifiers: [.command, .option, .shift])
+            .disabled(!editSession.commandHistory.canRedo)
+            
+            Divider()
+            
+            // Memory management
+            Button("Optimize Memory") {
+                editSession.commandHistory.performMemoryCleanup()
+            }
+            .keyboardShortcut("m", modifiers: [.command, .option])
+            
+            Button("Show Memory Usage") {
+                showMemoryUsageAlert()
+            }
+            .keyboardShortcut("m", modifiers: [.command, .shift])
+            
+            Divider()
+            
+            // Statistics
+            Button("Show History Statistics") {
+                showHistoryStatistics()
+            }
+            .keyboardShortcut("h", modifiers: [.command, .option])
+            
+            // Advanced options
+            Menu("Advanced") {
+                Button("Export History") {
+                    exportHistory()
+                }
+                
+                Button("Clear Statistics") {
+                    clearStatistics()
+                }
+                .foregroundColor(.red)
+                
+                Divider()
+                
+                Toggle("Auto Memory Cleanup", isOn: .constant(true))
+                    .disabled(true) // Would be configurable in full implementation
+            }
+        }
+    }
+    
+    // MARK: - History Navigation
+    
+    private func goToHistoryPosition(_ position: Int) async {
+        let currentPosition = editSession.commandHistory.currentPosition
+        let targetPosition = max(0, min(position, editSession.commandHistory.totalCommands))
+        
+        if targetPosition < currentPosition {
+            // Undo to target position
+            for _ in 0..<(currentPosition - targetPosition) {
+                await editSession.undo()
+            }
+        } else if targetPosition > currentPosition {
+            // Redo to target position
+            for _ in 0..<(targetPosition - currentPosition) {
+                await editSession.redo()
+            }
+        }
+    }
+    
+    private func undoAll() async {
+        while editSession.commandHistory.canUndo {
+            await editSession.undo()
+        }
+    }
+    
+    private func redoAll() async {
+        while editSession.commandHistory.canRedo {
+            await editSession.redo()
+        }
+    }
+    
+    // MARK: - Information Display
+    
+    private func showMemoryUsageAlert() {
+        let memoryMB = Double(editSession.commandHistory.memoryUsage) / 1_000_000.0
+        let commandCount = editSession.commandHistory.totalCommands
+        
+        DispatchQueue.main.async {
+            let alert = NSAlert()
+            alert.messageText = "Edit History Memory Usage"
+            alert.informativeText = """
+                Current memory usage: \(String(format: "%.1f MB", memoryMB))
+                Command count: \(commandCount)
+                Current position: \(editSession.commandHistory.currentPosition)
+                """
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
+        }
+    }
+    
+    private func showHistoryStatistics() {
+        let stats = editSession.commandHistory.statistics
+        
+        DispatchQueue.main.async {
+            let alert = NSAlert()
+            alert.messageText = "Edit History Statistics"
+            alert.informativeText = """
+                Total commands: \(stats.totalCommands)
+                Undo operations: \(stats.undoOperations)
+                Redo operations: \(stats.redoOperations)
+                Pruned commands: \(stats.prunedCommands)
+                Undo/Redo ratio: \(String(format: "%.2f", stats.undoRedoRatio))
+                Commands per minute: \(String(format: "%.1f", stats.averageCommandsPerMinute))
+                """
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
+        }
+    }
+    
+    // MARK: - Advanced Operations
+    
+    private func exportHistory() {
+        // Would implement history export functionality
+        let alert = NSAlert()
+        alert.messageText = "Export History"
+        alert.informativeText = "History export functionality would be implemented here."
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
+    
+    private func clearStatistics() {
+        // Would reset statistics while keeping history
+        let alert = NSAlert()
+        alert.messageText = "Clear Statistics"
+        alert.informativeText = "This would clear usage statistics while preserving the edit history."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Clear")
+        alert.addButton(withTitle: "Cancel")
+        if alert.runModal() == .alertFirstButtonReturn {
+            // Implementation would clear statistics here
         }
     }
 }

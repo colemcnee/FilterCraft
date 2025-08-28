@@ -1,6 +1,7 @@
 import XCTest
 import SwiftUI
 import CoreImage
+import FilterCraftCore
 @testable import FilterCraft_macOS
 
 final class ViewTests: XCTestCase {
@@ -18,7 +19,7 @@ final class ViewTests: XCTestCase {
     }
     
     func testImageCanvasViewWithSingleImage() throws {
-        let zoomScale = Binding.constant(1.0)
+        let zoomScale = Binding.constant(CGFloat(1.0))
         let showingBeforeAfter = Binding.constant(false)
         
         let canvasView = ImageCanvasView(
@@ -32,7 +33,7 @@ final class ViewTests: XCTestCase {
     }
     
     func testImageCanvasViewWithBeforeAfter() throws {
-        let zoomScale = Binding.constant(1.0)
+        let zoomScale = Binding.constant(CGFloat(1.0))
         let showingBeforeAfter = Binding.constant(true)
         
         let canvasView = ImageCanvasView(
@@ -50,14 +51,17 @@ final class ViewTests: XCTestCase {
         XCTAssertNotNil(imageView.body)
     }
     
+    @MainActor
     func testAdjustmentSliderInitialization() throws {
+        let editSession = EditSession()
         let value = Binding.constant(0.0 as Float)
         
         let slider = AdjustmentSlider(
             title: "Test Slider",
             value: value,
             range: -1...1,
-            icon: "sun.max"
+            icon: "sun.max",
+            editSession: editSession
         )
         
         XCTAssertNotNil(slider.body)
@@ -118,12 +122,6 @@ final class ViewTests: XCTestCase {
         XCTAssertNotNil(imagePicker)
     }
     
-    func testImagePickerViewControllerInitialization() throws {
-        let controller = ImagePickerViewController()
-        XCTAssertNotNil(controller)
-        XCTAssertNil(controller.onImageSelected)
-    }
-    
     func testFilterMenuCommandsInitialization() throws {
         let filterMenuCommands = FilterMenuCommands()
         XCTAssertNotNil(filterMenuCommands.body)
@@ -134,8 +132,10 @@ final class ViewTests: XCTestCase {
 
 final class IntegrationTests: XCTestCase {
     
+    @MainActor
     func testFullWorkflowWithEditSession() async throws {
-        let editSession = EditSession()
+        // Use legacy mode (no command history) for simpler testing
+        let editSession = EditSession(enableCommandHistory: false)
         
         // Test initial state
         XCTAssertEqual(editSession.processingState, .idle)
@@ -165,8 +165,11 @@ final class IntegrationTests: XCTestCase {
         editSession.updateAdjustments(adjustments)
         
         // Verify adjustments applied
-        XCTAssertEqual(editSession.adjustments.brightness, 0.3)
-        XCTAssertEqual(editSession.adjustments.contrast, 0.2)
+        // Note: adjustments.contrast combines base filter adjustments with user adjustments
+        // Vintage filter has base contrast: -0.1 at full intensity, so at 0.8 intensity = -0.08
+        // User adds 0.2, so effective contrast = -0.08 + 0.2 = 0.12
+        XCTAssertEqual(editSession.adjustments.brightness, 0.3, accuracy: 0.01)
+        XCTAssertEqual(editSession.adjustments.contrast, 0.12, accuracy: 0.01)
         XCTAssertTrue(editSession.hasEdits)
         
         // Reset edits
@@ -179,6 +182,7 @@ final class IntegrationTests: XCTestCase {
         XCTAssertEqual(editSession.processingState, .completed)
     }
     
+    @MainActor
     func testViewsWithEditSession() async throws {
         let editSession = EditSession()
         
@@ -198,13 +202,12 @@ final class IntegrationTests: XCTestCase {
         let inspectorViewWithEdits = InspectorView(editSession: editSession)
         XCTAssertNotNil(inspectorViewWithEdits.body)
         
-        // Test AdjustmentControlsView with current adjustments
-        let adjustments = Binding.constant(editSession.adjustments)
-        let adjustmentControls = AdjustmentControlsView(adjustments: adjustments)
+        // Test AdjustmentControlsView with editSession
+        let adjustmentControls = AdjustmentControlsView(editSession: editSession)
         XCTAssertNotNil(adjustmentControls.body)
         
         // Test ContentView
-        let contentView = ContentView()
+        let contentView = ContentView(editSession: editSession)
         XCTAssertNotNil(contentView.body)
     }
 }

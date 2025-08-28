@@ -6,7 +6,7 @@ import UniformTypeIdentifiers
 
 @MainActor
 struct ContentView: View {
-    @StateObject private var editSession = EditSession()
+    @ObservedObject var editSession: EditSession
     @State private var selectedImage: NSImage?
     @State private var dragIsActive = false
     @State private var selectedFilterType: FilterType = .none
