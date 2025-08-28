@@ -75,7 +75,7 @@ public struct CropRotateCommand: EditCommand {
             }
         }
         
-        return changes.isEmpty ? "Crop & Rotate Change" : changes.joined(separator(", "))
+        return changes.isEmpty ? "Crop & Rotate Change" : changes.joined(separator: ", ")
     }
     
     public var memoryFootprint: Int {

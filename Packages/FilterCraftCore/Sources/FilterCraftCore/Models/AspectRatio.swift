@@ -2,7 +2,7 @@ import Foundation
 import CoreGraphics
 
 /// Defines aspect ratio constraints for crop operations
-public enum AspectRatio: String, CaseIterable, Identifiable, Sendable {
+public enum AspectRatio: String, CaseIterable, Identifiable, Codable, Sendable {
     case freeForm = "freeForm"
     case square = "1:1"
     case traditional = "4:3"
@@ -124,16 +124,16 @@ public extension AspectRatio {
         }
         
         let containerRatio = containerSize.width / containerSize.height
-        var rectSize: CGSize
+        let rectSize: CGSize
         
         if containerRatio > targetRatio {
             // Container is wider than target - constrain by height
-            rectSize.height = containerSize.height * fillPercent
-            rectSize.width = rectSize.height * targetRatio
+            let height = containerSize.height * fillPercent
+            rectSize = CGSize(width: height * targetRatio, height: height)
         } else {
             // Container is taller than target - constrain by width
-            rectSize.width = containerSize.width * fillPercent
-            rectSize.height = rectSize.width / targetRatio
+            let width = containerSize.width * fillPercent
+            rectSize = CGSize(width: width, height: width / targetRatio)
         }
         
         return CGRect(
