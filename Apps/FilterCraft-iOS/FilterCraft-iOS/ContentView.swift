@@ -1,5 +1,5 @@
-import SwiftUI
 import FilterCraftCore
+import SwiftUI
 
 struct ContentView: View {
     @StateObject private var editSession = EditSession()

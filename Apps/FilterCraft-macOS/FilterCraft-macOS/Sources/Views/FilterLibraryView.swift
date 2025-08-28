@@ -1,5 +1,5 @@
-import SwiftUI
 import FilterCraftCore
+import SwiftUI
 
 struct FilterLibraryView: View {
     @ObservedObject var editSession: EditSession

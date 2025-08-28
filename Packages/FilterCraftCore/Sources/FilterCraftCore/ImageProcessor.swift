@@ -346,7 +346,7 @@ public class ImageProcessor: ImageProcessing, @unchecked Sendable {
     }
     
     private func renderImageToData(_ image: CIImage, format: ImageExportFormat, quality: Float) -> Data? {
-        let _ = max(0.0, min(1.0, quality)) // Quality parameter for future use
+        _ = max(0.0, min(1.0, quality)) // Quality parameter for future use
         
         switch format {
         case .jpeg:

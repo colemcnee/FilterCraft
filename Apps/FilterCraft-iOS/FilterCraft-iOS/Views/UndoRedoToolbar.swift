@@ -1,5 +1,5 @@
-import SwiftUI
 import FilterCraftCore
+import SwiftUI
 
 /// iOS toolbar component providing undo/redo functionality
 ///

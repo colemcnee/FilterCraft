@@ -1,5 +1,5 @@
-import Foundation
 import Combine
+import Foundation
 
 /// Memory-efficient history manager for undo/redo operations
 ///
@@ -50,7 +50,7 @@ public class EditHistory: ObservableObject {
     private let cleanupInterval: TimeInterval = 30.0 // 30 seconds
     
     // Performance tracking
-    private var lastOperationTime: Date = Date()
+    private var lastOperationTime = Date()
     private var operationCount: Int = 0
     
     // MARK: - Initialization

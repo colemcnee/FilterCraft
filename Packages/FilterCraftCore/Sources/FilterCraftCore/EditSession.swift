@@ -1,6 +1,6 @@
+import Combine
 import CoreImage
 import Foundation
-import Combine
 
 /// Represents different types of edit operations for history tracking
 public enum EditOperationType: String, CaseIterable {
@@ -137,7 +137,7 @@ public class EditSession: ObservableObject {
     @Published public private(set) var editHistory: [EditOperation] = []
     
     /// New command-based history system for undo/redo
-    @Published public private(set) var commandHistory: EditHistory = EditHistory()
+    @Published public private(set) var commandHistory = EditHistory()
     
     /// Whether command-based history is enabled (can be disabled for legacy compatibility)
     public let commandHistoryEnabled: Bool

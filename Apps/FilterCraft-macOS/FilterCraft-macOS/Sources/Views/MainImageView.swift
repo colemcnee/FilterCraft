@@ -1,5 +1,5 @@
-import SwiftUI
 import FilterCraftCore
+import SwiftUI
 import UniformTypeIdentifiers
 
 struct MainImageView: View {

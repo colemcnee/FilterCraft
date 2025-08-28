@@ -1,5 +1,5 @@
-import SwiftUI
 import FilterCraftCore
+import SwiftUI
 
 internal struct AdjustmentControlsView: View {
     @ObservedObject var editSession: EditSession

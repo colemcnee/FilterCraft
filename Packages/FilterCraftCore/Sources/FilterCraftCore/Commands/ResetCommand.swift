@@ -1,5 +1,5 @@
-import Foundation
 import CoreImage
+import Foundation
 
 /// Command for handling various reset operations
 ///
