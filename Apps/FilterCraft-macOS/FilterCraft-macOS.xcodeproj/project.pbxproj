@@ -3,13 +3,16 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		0833DBDFA2DF415888328482 /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A792F4B87FF98519B60C8DE /* ToolbarView.swift */; };
 		3554613802619DDAA43D2821 /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF4D1A502E994C9CF265F2B /* ImagePickerView.swift */; };
 		3D30BB4CB5BB1F3A34BB60DC /* FilterLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7554D659742059AC17A6EAD /* FilterLibraryView.swift */; };
+		49E70E1C2E5FF95E003D5A2B /* MacCropOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E192E5FF95E003D5A2B /* MacCropOverlay.swift */; };
+		49E70E1D2E5FF95E003D5A2B /* MacCropControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E182E5FF95E003D5A2B /* MacCropControls.swift */; };
+		49E70E1E2E5FF95E003D5A2B /* MacCropRotateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E1A2E5FF95E003D5A2B /* MacCropRotateView.swift */; };
 		4E2E04E287B089A4CC51264B /* ViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E32202F14552A629FDB0519B /* ViewTests.swift */; };
 		4E831A1DF577E4F94632CF51 /* FilterCraftCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF807B9F389C0AA53FECDB90 /* FilterCraftCommands.swift */; };
 		5ECCEAB2ACF3FC4BF36749F6 /* DropZoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B59C5F69B34BAAFB943466 /* DropZoneView.swift */; };
@@ -40,6 +43,9 @@
 		33D792C734D275038FC85F53 /* FilterCraftApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCraftApp.swift; sourceTree = "<group>"; };
 		3969B320B9D0C2013E0614E8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		43947E7E331794F6E820ACA8 /* ImageCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCanvasView.swift; sourceTree = "<group>"; };
+		49E70E182E5FF95E003D5A2B /* MacCropControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCropControls.swift; sourceTree = "<group>"; };
+		49E70E192E5FF95E003D5A2B /* MacCropOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCropOverlay.swift; sourceTree = "<group>"; };
+		49E70E1A2E5FF95E003D5A2B /* MacCropRotateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCropRotateView.swift; sourceTree = "<group>"; };
 		4BF48363C6B25E568E1D4F1D /* FilterCraft-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "FilterCraft-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A792F4B87FF98519B60C8DE /* ToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarView.swift; sourceTree = "<group>"; };
 		832C1F224538FAF958D771C6 /* MainImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainImageView.swift; sourceTree = "<group>"; };
@@ -86,6 +92,9 @@
 		8355C119E24C597E10FFB577 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				49E70E182E5FF95E003D5A2B /* MacCropControls.swift */,
+				49E70E192E5FF95E003D5A2B /* MacCropOverlay.swift */,
+				49E70E1A2E5FF95E003D5A2B /* MacCropRotateView.swift */,
 				CD1AD7D238CF862A4B79CA25 /* AdjustmentControlsView.swift */,
 				C6B59C5F69B34BAAFB943466 /* DropZoneView.swift */,
 				32C2D547954650C24A26ACBA /* FilterButton.swift */,
@@ -198,7 +207,6 @@
 			packageReferences = (
 				82E4D229B6CFD90D8E9BEA57 /* XCLocalSwiftPackageReference "../../Packages/FilterCraftCore" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -216,6 +224,9 @@
 				826FD1B9EAC24F1C3F9AE0DD /* AdjustmentControlsView.swift in Sources */,
 				992EA4CB485E5E199190E41B /* ContentView.swift in Sources */,
 				5ECCEAB2ACF3FC4BF36749F6 /* DropZoneView.swift in Sources */,
+				49E70E1C2E5FF95E003D5A2B /* MacCropOverlay.swift in Sources */,
+				49E70E1D2E5FF95E003D5A2B /* MacCropControls.swift in Sources */,
+				49E70E1E2E5FF95E003D5A2B /* MacCropRotateView.swift in Sources */,
 				EC1D751899385F1F68F6F1E5 /* FilterButton.swift in Sources */,
 				BE48156663A4EC0EAB7E66C9 /* FilterCraftApp.swift in Sources */,
 				4E831A1DF577E4F94632CF51 /* FilterCraftCommands.swift in Sources */,

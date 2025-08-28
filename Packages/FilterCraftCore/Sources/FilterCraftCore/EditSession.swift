@@ -736,6 +736,28 @@ public class EditSession: ObservableObject {
     }
 }
 
+#if DEBUG
+extension EditSession {
+    static public var preview: EditSession {
+        let session = EditSession()
+        
+        // Add fake data for previews
+        session.userAdjustments = ImageAdjustments(
+            brightness: 0.1,
+            contrast: 1.1,
+            saturation: 1.2
+        )
+
+        session.cropRotateState = CropRotateState()
+        
+        session.originalImage = CIImage(color: .gray).cropped(to: CGRect(x: 0, y: 0, width: 512, height: 512))
+        session.previewImage = session.originalImage
+        
+        return session
+    }
+}
+#endif
+
 // MARK: - Session Statistics
 
 /// Tracks statistics for the current editing session

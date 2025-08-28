@@ -11,21 +11,7 @@ struct ContentView: View {
                 VStack(spacing: 0) {
                     // Undo/Redo controls at the top
                     HStack {
-                        Button {
-                            Task { await editSession.undo() }
-                        } label: {
-                            Image(systemName: "arrow.uturn.backward")
-                                .foregroundColor(editSession.commandHistory.canUndo ? .blue : .gray)
-                        }
-                        .disabled(!editSession.commandHistory.canUndo)
-                        
-                        Button {
-                            Task { await editSession.redo() }
-                        } label: {
-                            Image(systemName: "arrow.uturn.forward")
-                                .foregroundColor(editSession.commandHistory.canRedo ? .blue : .gray)
-                        }
-                        .disabled(!editSession.commandHistory.canRedo)
+                        CompactUndoRedoToolbar(editSession: editSession)
                         
                         Spacer()
                         
@@ -37,10 +23,9 @@ struct ContentView: View {
                     }
                     .padding(.horizontal)
                     .padding(.vertical, 8)
-                    
+                    ImageDisplayView(editSession: editSession)
                     ScrollView {
                         VStack(spacing: 24) {
-                            ImageDisplayView(editSession: editSession)
                             FilterSelectionView(editSession: editSession)
                             AdjustmentControlsView(editSession: editSession)
                             ExportOptionsView(editSession: editSession)

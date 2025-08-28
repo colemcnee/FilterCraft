@@ -16,6 +16,12 @@
 		49E70E132E5E1BD6003D5A2B /* AdjustmentControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E0B2E5E1BD6003D5A2B /* AdjustmentControlsView.swift */; };
 		49E70E142E5E1BD6003D5A2B /* PhotoPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E0F2E5E1BD6003D5A2B /* PhotoPickerView.swift */; };
 		49E70E152E5E1BD6003D5A2B /* ExportOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E0C2E5E1BD6003D5A2B /* ExportOptionsView.swift */; };
+		49E70E172E5FF47B003D5A2B /* UndoRedoToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E162E5FF47B003D5A2B /* UndoRedoToolbar.swift */; };
+		49E70E262E5FF999003D5A2B /* CropOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E202E5FF999003D5A2B /* CropOverlayView.swift */; };
+		49E70E272E5FF999003D5A2B /* AspectRatioSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E1F2E5FF999003D5A2B /* AspectRatioSelector.swift */; };
+		49E70E282E5FF999003D5A2B /* FlipControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E222E5FF999003D5A2B /* FlipControls.swift */; };
+		49E70E292E5FF999003D5A2B /* RotationControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E232E5FF999003D5A2B /* RotationControl.swift */; };
+		49E70E2A2E5FF999003D5A2B /* CropRotateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E70E212E5FF999003D5A2B /* CropRotateView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +36,12 @@
 		49E70E0D2E5E1BD6003D5A2B /* FilterSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSelectionView.swift; sourceTree = "<group>"; };
 		49E70E0E2E5E1BD6003D5A2B /* ImageDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDisplayView.swift; sourceTree = "<group>"; };
 		49E70E0F2E5E1BD6003D5A2B /* PhotoPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerView.swift; sourceTree = "<group>"; };
+		49E70E162E5FF47B003D5A2B /* UndoRedoToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoRedoToolbar.swift; sourceTree = "<group>"; };
+		49E70E1F2E5FF999003D5A2B /* AspectRatioSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectRatioSelector.swift; sourceTree = "<group>"; };
+		49E70E202E5FF999003D5A2B /* CropOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropOverlayView.swift; sourceTree = "<group>"; };
+		49E70E212E5FF999003D5A2B /* CropRotateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropRotateView.swift; sourceTree = "<group>"; };
+		49E70E222E5FF999003D5A2B /* FlipControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipControls.swift; sourceTree = "<group>"; };
+		49E70E232E5FF999003D5A2B /* RotationControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotationControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,13 +96,35 @@
 		49E70E102E5E1BD6003D5A2B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				49E70E252E5FF999003D5A2B /* EditingViews */,
 				49E70E0B2E5E1BD6003D5A2B /* AdjustmentControlsView.swift */,
 				49E70E0C2E5E1BD6003D5A2B /* ExportOptionsView.swift */,
 				49E70E0D2E5E1BD6003D5A2B /* FilterSelectionView.swift */,
 				49E70E0E2E5E1BD6003D5A2B /* ImageDisplayView.swift */,
 				49E70E0F2E5E1BD6003D5A2B /* PhotoPickerView.swift */,
+				49E70E162E5FF47B003D5A2B /* UndoRedoToolbar.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		49E70E242E5FF999003D5A2B /* CropRotate */ = {
+			isa = PBXGroup;
+			children = (
+				49E70E1F2E5FF999003D5A2B /* AspectRatioSelector.swift */,
+				49E70E202E5FF999003D5A2B /* CropOverlayView.swift */,
+				49E70E212E5FF999003D5A2B /* CropRotateView.swift */,
+				49E70E222E5FF999003D5A2B /* FlipControls.swift */,
+				49E70E232E5FF999003D5A2B /* RotationControl.swift */,
+			);
+			path = CropRotate;
+			sourceTree = "<group>";
+		};
+		49E70E252E5FF999003D5A2B /* EditingViews */ = {
+			isa = PBXGroup;
+			children = (
+				49E70E242E5FF999003D5A2B /* CropRotate */,
+			);
+			path = EditingViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -171,7 +205,13 @@
 				01000003294A5C7A00000001 /* ContentView.swift in Sources */,
 				49E70E112E5E1BD6003D5A2B /* FilterSelectionView.swift in Sources */,
 				49E70E122E5E1BD6003D5A2B /* ImageDisplayView.swift in Sources */,
+				49E70E172E5FF47B003D5A2B /* UndoRedoToolbar.swift in Sources */,
 				49E70E132E5E1BD6003D5A2B /* AdjustmentControlsView.swift in Sources */,
+				49E70E262E5FF999003D5A2B /* CropOverlayView.swift in Sources */,
+				49E70E272E5FF999003D5A2B /* AspectRatioSelector.swift in Sources */,
+				49E70E282E5FF999003D5A2B /* FlipControls.swift in Sources */,
+				49E70E292E5FF999003D5A2B /* RotationControl.swift in Sources */,
+				49E70E2A2E5FF999003D5A2B /* CropRotateView.swift in Sources */,
 				49E70E142E5E1BD6003D5A2B /* PhotoPickerView.swift in Sources */,
 				49E70E152E5E1BD6003D5A2B /* ExportOptionsView.swift in Sources */,
 				01000001294A5C7A00000001 /* FilterCraft_iOSApp.swift in Sources */,

@@ -7,6 +7,7 @@ struct CropRotateView: View {
     @State private var showingAspectRatioPicker = false
     @State private var isDragging = false
     @State private var lastScaleValue: CGFloat = 1.0
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         ZStack {
@@ -31,7 +32,7 @@ struct CropRotateView: View {
         GeometryReader { geometry in
             ZStack {
                 // Background image
-                if let previewImage = editSession.previewImage {
+                if let previewImage = editSession.previewImage?.toCGImage() {
                     Image(decorative: previewImage, scale: 1.0)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
@@ -71,6 +72,7 @@ struct CropRotateView: View {
             Button("Cancel") {
                 editSession.cancelTemporaryCropRotateState()
                 // Navigate back
+                dismiss()
             }
             .foregroundColor(.white)
             .fontWeight(.medium)
@@ -92,6 +94,7 @@ struct CropRotateView: View {
             Button("Done") {
                 editSession.commitTemporaryCropRotateState()
                 // Navigate back
+                dismiss()
             }
             .foregroundColor(.yellow)
             .fontWeight(.bold)

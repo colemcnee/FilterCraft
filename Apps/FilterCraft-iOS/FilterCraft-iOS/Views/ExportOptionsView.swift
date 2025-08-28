@@ -24,18 +24,19 @@ struct ExportOptionsView: View {
                     }
                     .disabled(editSession.originalImage == nil)
                     
-                    Button(action: { showingSessionStats() }) {
-                        HStack {
-                            Image(systemName: "chart.bar")
-                            Text("Stats")
-                        }
-                        .font(.subheadline)
-                        .foregroundColor(.blue)
-                        .padding()
-                        .background(Color.blue.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    }
-                    .frame(maxWidth: 100)
+                    
+//                    Button(action: { showingSessionStats() }) {
+//                        HStack {
+//                            Image(systemName: "chart.bar")
+//                            Text("Stats")
+//                        }
+//                        .font(.subheadline)
+//                        .foregroundColor(.blue)
+//                        .padding()
+//                        .background(Color.blue.opacity(0.1))
+//                        .clipShape(RoundedRectangle(cornerRadius: 12))
+//                    }
+//                    .frame(maxWidth: 100)
                 }
             }
         }

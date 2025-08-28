@@ -189,13 +189,13 @@ struct CropOverlayView: View {
         
         isDragging = true
         let normalizedTranslation = CGSize(
-            width: translation.x / geometry.size.width,
-            height: translation.y / geometry.size.height
+            width: translation.width / geometry.size.width,
+            height: translation.height / geometry.size.height
         )
         
         var newCropRect = editSession.effectiveCropRotateState.cropRect
-        newCropRect.origin.x += normalizedTranslation.x - dragOffset.width
-        newCropRect.origin.y += normalizedTranslation.y - dragOffset.height
+        newCropRect.origin.x += normalizedTranslation.width - dragOffset.width
+        newCropRect.origin.y += normalizedTranslation.height - dragOffset.height
         
         // Constrain to bounds
         newCropRect.origin.x = max(0, min(1 - newCropRect.width, newCropRect.origin.x))
@@ -205,8 +205,8 @@ struct CropOverlayView: View {
         editSession.updateCropRotateStateTemporary(newState)
         
         dragOffset = CGSize(
-            width: translation.x / geometry.size.width,
-            height: translation.y / geometry.size.height
+            width: translation.width / geometry.size.width,
+            height: translation.height / geometry.size.height
         )
     }
     
@@ -214,8 +214,8 @@ struct CropOverlayView: View {
         isResizing = true
         
         let normalizedTranslation = CGSize(
-            width: translation.x / geometry.size.width,
-            height: translation.y / geometry.size.height
+            width: translation.width / geometry.size.width,
+            height: translation.height / geometry.size.height
         )
         
         var newCropRect = initialCropRect.isEmpty ? editSession.effectiveCropRotateState.cropRect : initialCropRect
@@ -263,8 +263,8 @@ struct CropOverlayView: View {
         isResizing = true
         
         let normalizedTranslation = CGSize(
-            width: translation.x / geometry.size.width,
-            height: translation.y / geometry.size.height
+            width: translation.width / geometry.size.width,
+            height: translation.height / geometry.size.height
         )
         
         var newCropRect = initialCropRect.isEmpty ? editSession.effectiveCropRotateState.cropRect : initialCropRect
