@@ -240,6 +240,8 @@ extension EditOperationType {
             return "slider.horizontal.3"
         case .filterApplication:
             return "camera.filters"
+        case .cropRotateChange:
+            return "crop.rotate"
         case .reset:
             return "arrow.counterclockwise"
         }

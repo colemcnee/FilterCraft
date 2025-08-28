@@ -9,8 +9,14 @@ public protocol ImageProcessing {
     /// Apply a filter to a CIImage with specified intensity
     func applyFilter(_ filterType: FilterType, intensity: Float, to image: CIImage) async -> CIImage?
     
+    /// Apply crop and rotate transformations to a CIImage
+    func applyCropRotate(_ cropRotateState: CropRotateState, to image: CIImage) async -> CIImage?
+    
     /// Apply both adjustments and filter in the optimal order
     func processImage(_ image: CIImage, adjustments: ImageAdjustments, filter: AppliedFilter?) async -> CIImage?
+    
+    /// Process image with all transformations: adjustments, filters, crop, and rotate
+    func processImage(_ image: CIImage, adjustments: ImageAdjustments, filter: AppliedFilter?, cropRotate: CropRotateState?) async -> CIImage?
     
     /// Generate a preview version of an image (scaled down for performance)
     func generatePreview(from image: CIImage, maxDimension: CGFloat) async -> CIImage?
@@ -101,6 +107,41 @@ public class ImageProcessor: ImageProcessing, @unchecked Sendable {
             processingQueue.async {
                 let result = self.scaleImageForPreview(image, maxDimension: maxDimension)
                 continuation.resume(returning: result)
+            }
+        }
+    }
+    
+    public func applyCropRotate(_ cropRotateState: CropRotateState, to image: CIImage) async -> CIImage? {
+        return await withCheckedContinuation { continuation in
+            processingQueue.async {
+                let result = self.processCropRotate(cropRotateState, image: image)
+                continuation.resume(returning: result)
+            }
+        }
+    }
+    
+    public func processImage(_ image: CIImage, adjustments: ImageAdjustments, filter: AppliedFilter?, cropRotate: CropRotateState?) async -> CIImage? {
+        return await withCheckedContinuation { continuation in
+            processingQueue.async {
+                var processedImage = image
+                
+                // Apply transformations in optimal order:
+                // 1. Crop and rotate first (on original image)
+                if let cropRotate = cropRotate, cropRotate.hasTransformations {
+                    processedImage = self.processCropRotate(cropRotate, image: processedImage) ?? processedImage
+                }
+                
+                // 2. Apply adjustments
+                if adjustments.hasAdjustments {
+                    processedImage = self.processAdjustments(adjustments, image: processedImage) ?? processedImage
+                }
+                
+                // 3. Apply filter last
+                if let filter = filter, filter.isEffective {
+                    processedImage = self.processFilter(filter.filterType, intensity: filter.intensity, image: processedImage) ?? processedImage
+                }
+                
+                continuation.resume(returning: processedImage)
             }
         }
     }
@@ -357,6 +398,96 @@ public class ImageProcessor: ImageProcessing, @unchecked Sendable {
             return context.heifRepresentation(of: image, format: .RGBA8, colorSpace: CGColorSpaceCreateDeviceRGB(), options: [:])
         }
     }
+    
+    // MARK: - Crop and Rotate Processing
+    
+    private func processCropRotate(_ cropRotateState: CropRotateState, image: CIImage) -> CIImage? {
+        guard cropRotateState.hasTransformations else { return image }
+        
+        var transformedImage = image
+        
+        // Apply transformations in correct order:
+        // 1. Rotation first (before crop to avoid coordinate complications)
+        if cropRotateState.rotationAngle != 0 {
+            transformedImage = applyRotation(cropRotateState.rotationAngle, to: transformedImage)
+        }
+        
+        // 2. Flips (after rotation, before crop)
+        if cropRotateState.isFlippedHorizontally {
+            transformedImage = applyHorizontalFlip(to: transformedImage)
+        }
+        
+        if cropRotateState.isFlippedVertically {
+            transformedImage = applyVerticalFlip(to: transformedImage)
+        }
+        
+        // 3. Crop last (after all other geometric transformations)
+        if cropRotateState.cropRect != CGRect(x: 0, y: 0, width: 1, height: 1) {
+            transformedImage = applyCrop(cropRotateState.cropRect, to: transformedImage)
+        }
+        
+        return transformedImage
+    }
+    
+    private func applyRotation(_ angle: Float, to image: CIImage) -> CIImage {
+        guard angle != 0 else { return image }
+        
+        // Create rotation transform around image center
+        let extent = image.extent
+        let center = CGPoint(x: extent.midX, y: extent.midY)
+        
+        // Move to origin, rotate, move back
+        let translateToOrigin = CGAffineTransform(translationX: -center.x, y: -center.y)
+        let rotate = CGAffineTransform(rotationAngle: CGFloat(angle))
+        let translateBack = CGAffineTransform(translationX: center.x, y: center.y)
+        
+        let transform = translateToOrigin.concatenating(rotate).concatenating(translateBack)
+        let rotatedImage = image.transformed(by: transform)
+        
+        // Adjust bounds to prevent clipping by translating to positive coordinates
+        let rotatedExtent = rotatedImage.extent
+        if rotatedExtent.minX < 0 || rotatedExtent.minY < 0 {
+            let translation = CGAffineTransform(
+                translationX: max(0, -rotatedExtent.minX),
+                y: max(0, -rotatedExtent.minY)
+            )
+            return rotatedImage.transformed(by: translation)
+        }
+        
+        return rotatedImage
+    }
+    
+    private func applyCrop(_ normalizedRect: CGRect, to image: CIImage) -> CIImage {
+        let extent = image.extent
+        
+        // Convert normalized coordinates to pixel coordinates
+        let cropRect = CGRect(
+            x: extent.minX + normalizedRect.minX * extent.width,
+            y: extent.minY + normalizedRect.minY * extent.height,
+            width: normalizedRect.width * extent.width,
+            height: normalizedRect.height * extent.height
+        )
+        
+        // Ensure crop rect is within image bounds
+        let boundedCropRect = cropRect.intersection(extent)
+        guard !boundedCropRect.isEmpty else { return image }
+        
+        return image.cropped(to: boundedCropRect)
+    }
+    
+    private func applyHorizontalFlip(to image: CIImage) -> CIImage {
+        let extent = image.extent
+        let transform = CGAffineTransform(scaleX: -1, y: 1)
+            .translatedBy(x: -extent.width, y: 0)
+        return image.transformed(by: transform)
+    }
+    
+    private func applyVerticalFlip(to image: CIImage) -> CIImage {
+        let extent = image.extent
+        let transform = CGAffineTransform(scaleX: 1, y: -1)
+            .translatedBy(x: 0, y: -extent.height)
+        return image.transformed(by: transform)
+    }
 }
 
 // MARK: - Mock Implementation for Testing
@@ -379,7 +510,17 @@ public class MockImageProcessor: ImageProcessing {
         return shouldFail ? nil : image
     }
     
+    public func applyCropRotate(_ cropRotateState: CropRotateState, to image: CIImage) async -> CIImage? {
+        try? await Task.sleep(nanoseconds: UInt64(processingDelay * 1_000_000_000))
+        return shouldFail ? nil : image
+    }
+    
     public func processImage(_ image: CIImage, adjustments: ImageAdjustments, filter: AppliedFilter?) async -> CIImage? {
+        try? await Task.sleep(nanoseconds: UInt64(processingDelay * 1_000_000_000))
+        return shouldFail ? nil : image
+    }
+    
+    public func processImage(_ image: CIImage, adjustments: ImageAdjustments, filter: AppliedFilter?, cropRotate: CropRotateState?) async -> CIImage? {
         try? await Task.sleep(nanoseconds: UInt64(processingDelay * 1_000_000_000))
         return shouldFail ? nil : image
     }

@@ -10,6 +10,7 @@ struct ToolbarView: ToolbarContent {
     let onOpenImage: () -> Void
     let onSaveImage: () -> Void
     let onReset: () -> Void
+    let onEnterCropMode: () -> Void
     
     var body: some ToolbarContent {
         ToolbarItemGroup(placement: .automatic) {
@@ -22,6 +23,15 @@ struct ToolbarView: ToolbarContent {
                 Image(systemName: "square.and.arrow.down")
             }
             .help("Save Image (⌘S)")
+            .disabled(editSession.originalImage == nil)
+            
+            Divider()
+                .frame(height: 20)
+            
+            Button(action: onEnterCropMode) {
+                Image(systemName: "crop.rotate")
+            }
+            .help("Crop & Rotate (⌘⇧R)")
             .disabled(editSession.originalImage == nil)
         }
         

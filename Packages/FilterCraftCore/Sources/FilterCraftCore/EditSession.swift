@@ -6,6 +6,7 @@ import Foundation
 public enum EditOperationType: String, CaseIterable {
     case adjustmentChange = "adjustment"
     case filterApplication = "filter"
+    case cropRotateChange = "cropRotate"
     case reset = "reset"
     case imageLoad = "load"
     
@@ -13,8 +14,19 @@ public enum EditOperationType: String, CaseIterable {
         switch self {
         case .adjustmentChange: return "Adjustment"
         case .filterApplication: return "Filter"
+        case .cropRotateChange: return "Crop & Rotate"
         case .reset: return "Reset"
         case .imageLoad: return "Load Image"
+        }
+    }
+    
+    public var iconName: String {
+        switch self {
+        case .adjustmentChange: return "slider.horizontal.3"
+        case .filterApplication: return "camera.filters"
+        case .cropRotateChange: return "crop.rotate"
+        case .reset: return "arrow.counterclockwise"
+        case .imageLoad: return "photo"
         }
     }
 }
@@ -124,6 +136,18 @@ public class EditSession: ObservableObject {
     /// Filter currently being processed (for immediate UI feedback)
     @Published public private(set) var pendingFilter: FilterType?
     
+    /// Current crop and rotate state
+    @Published public private(set) var cropRotateState: CropRotateState = .identity {
+        didSet {
+            if cropRotateState != oldValue {
+                Task {
+                    await updatePreview(reason: "Crop/rotate state changed")
+                    recordOperation(.cropRotateChange, description: cropRotateState.transformationDescription)
+                }
+            }
+        }
+    }
+    
     /// Current preview image for display
     @Published public private(set) var previewImage: CIImage?
     
@@ -147,7 +171,10 @@ public class EditSession: ObservableObject {
     
     /// Whether any edits have been made
     public var hasEdits: Bool {
-        baseAdjustments.hasAdjustments || userAdjustments.hasAdjustments || appliedFilter?.isEffective == true
+        baseAdjustments.hasAdjustments || 
+        userAdjustments.hasAdjustments || 
+        appliedFilter?.isEffective == true ||
+        cropRotateState.hasTransformations
     }
     
     /// Current image extent for UI calculations
@@ -361,7 +388,8 @@ public class EditSession: ObservableObject {
         let finalImage = await imageProcessor.processImage(
             originalImage,
             adjustments: adjustments,
-            filter: appliedFilter
+            filter: appliedFilter,
+            cropRotate: cropRotateState.hasTransformations ? cropRotateState : nil
         )
         
         processingState = .processing(progress: 1.0, operation: "Final processing complete")
@@ -557,11 +585,13 @@ public class EditSession: ObservableObject {
             
             processingState = .processing(progress: 0.7, operation: "Applying effects")
             
-            // Apply edits to preview
+            // Apply edits to preview (including crop/rotate)
+            let effectiveState = effectiveCropRotateState
             let processedPreview = await imageProcessor.processImage(
                 previewBase,
                 adjustments: adjustments,
-                filter: appliedFilter
+                filter: appliedFilter,
+                cropRotate: effectiveState.hasTransformations ? effectiveState : nil
             )
             
             if !Task.isCancelled {
@@ -587,7 +617,146 @@ public class EditSession: ObservableObject {
         
         sessionStats.recordOperation(type)
     }
+    
+    // MARK: - Crop & Rotate Methods
+    
+    @Published private var temporaryCropRotateState: CropRotateState?
+    
+    /// Update crop and rotate state with command pattern
+    public func updateCropRotateState(_ newState: CropRotateState) {
+        guard newState != cropRotateState else { return }
+        
+        if commandHistoryEnabled {
+            let command = CropRotateCommand(
+                previousState: cropRotateState,
+                newState: newState
+            )
+            Task {
+                await executeCommand(command)
+            }
+        } else {
+            cropRotateState = newState
+        }
+    }
+    
+    /// Update crop/rotate state temporarily during gestures (no command creation)
+    public func updateCropRotateStateTemporary(_ newState: CropRotateState) {
+        temporaryCropRotateState = newState
+        Task {
+            await updatePreview(reason: "Temporary crop/rotate state changed")
+        }
+    }
+    
+    /// Commit the temporary crop/rotate state as the actual state
+    public func commitTemporaryCropRotateState() {
+        guard let tempState = temporaryCropRotateState else { return }
+        temporaryCropRotateState = nil
+        updateCropRotateState(tempState)
+    }
+    
+    /// Cancel temporary crop/rotate changes
+    public func cancelTemporaryCropRotateState() {
+        guard temporaryCropRotateState != nil else { return }
+        temporaryCropRotateState = nil
+        Task {
+            await updatePreview(reason: "Cancelled temporary crop/rotate state")
+        }
+    }
+    
+    /// Get the effective crop/rotate state (temporary if available, otherwise actual)
+    public var effectiveCropRotateState: CropRotateState {
+        return temporaryCropRotateState ?? cropRotateState
+    }
+    
+    /// Apply crop and rotate state directly (used by commands)
+    internal func applyCropRotateStateDirectly(_ state: CropRotateState) async {
+        await MainActor.run {
+            cropRotateState = state
+        }
+        
+        // Trigger image reprocessing with new crop/rotate
+        await updatePreview(reason: "Crop/rotate applied")
+    }
+    
+    /// Reset crop and rotate to identity
+    public func resetCropRotate() {
+        updateCropRotateState(.identity)
+    }
+    
+    /// Apply only crop (keeping current rotation and flips)
+    public func updateCropRect(_ newRect: CGRect) {
+        let newState = cropRotateState.withCropRect(newRect)
+        updateCropRotateState(newState)
+    }
+    
+    /// Apply rotation change (keeping current crop and flips)
+    public func updateRotation(_ newAngle: Float) {
+        let newState = cropRotateState.withRotation(newAngle)
+        updateCropRotateState(newState)
+    }
+    
+    /// Rotate by a delta amount
+    public func rotateByDelta(_ deltaAngle: Float) {
+        let newState = cropRotateState.withRotationDelta(deltaAngle)
+        updateCropRotateState(newState)
+    }
+    
+    /// Rotate by 90 degrees clockwise
+    public func rotate90Clockwise() {
+        rotateByDelta(.pi / 2)
+    }
+    
+    /// Rotate by 90 degrees counter-clockwise
+    public func rotate90CounterClockwise() {
+        rotateByDelta(-.pi / 2)
+    }
+    
+    /// Toggle horizontal flip
+    public func toggleHorizontalFlip() {
+        let newState = cropRotateState.withToggledHorizontalFlip()
+        updateCropRotateState(newState)
+    }
+    
+    /// Toggle vertical flip
+    public func toggleVerticalFlip() {
+        let newState = cropRotateState.withToggledVerticalFlip()
+        updateCropRotateState(newState)
+    }
+    
+    /// Update aspect ratio constraint
+    public func updateAspectRatio(_ aspectRatio: AspectRatio?) {
+        let newState = cropRotateState.withAspectRatio(aspectRatio)
+        updateCropRotateState(newState)
+    }
+    
+    /// Get the current crop rectangle in pixel coordinates
+    public func pixelCropRect() -> CGRect? {
+        guard let originalImage = originalImage else { return nil }
+        return cropRotateState.pixelCropRect(for: originalImage.extent.size)
+    }
 }
+
+#if DEBUG
+extension EditSession {
+    static public var preview: EditSession {
+        let session = EditSession()
+        
+        // Add fake data for previews
+        session.userAdjustments = ImageAdjustments(
+            brightness: 0.1,
+            contrast: 1.1,
+            saturation: 1.2
+        )
+
+        session.cropRotateState = CropRotateState()
+        
+        session.originalImage = CIImage(color: .gray).cropped(to: CGRect(x: 0, y: 0, width: 512, height: 512))
+        session.previewImage = session.originalImage
+        
+        return session
+    }
+}
+#endif
 
 // MARK: - Session Statistics
 
